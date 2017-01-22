@@ -2,6 +2,7 @@ package mpocr;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import javax.swing.JPanel;
 public class mCanvas extends JPanel {
 
     int[][] iData;
-    int pixelWidth = 1, pixelHeight = 1;
+    int pixelWidth = 1, pixelHeight = 1, offSet = 0;
 
     public mCanvas() {
         iData = null;
@@ -41,18 +42,37 @@ public class mCanvas extends JPanel {
         for (int i = 0; i < iData.length; i++) {
             System.out.println();
             for (int j = 0; j < iData[0].length; j++) {
-                System.out.print(iData[i][j]);
+                if(iData[i][j] == 0) {
+                    System.out.print("#  ");
+                } else {
+                    System.out.print(iData[i][j] + ", ");
+                }
             }
         }
+        System.out.println();
     }
 
+    public void thin() {
+        if(iData == null)
+            return;
+        OCRCore.thin1(this);
+        redraw();
+    }
+    
+    public void setOffset(int offset) {
+        this.offSet = offset;
+        repaint();
+    }
+    
     public void setPixel(int y, int x, int color) {
         try {
+            ++x;
+            ++y;
             iData[x][y] = color;
             this.getGraphics().setColor(new Color(iData[y][x]));
             this.getGraphics().fillRect(
-                    x * pixelWidth,
-                    y * pixelHeight,
+                    x * (pixelWidth + offSet),
+                    y * (pixelHeight + offSet),
                     pixelWidth,
                     pixelHeight
             );
@@ -61,19 +81,42 @@ public class mCanvas extends JPanel {
         }
     }
 
+    public void redraw() {
+        Graphics g = getGraphics();
+        for (int i = 0; i < iData.length; i++) {
+            for (int j = 0; j < iData[0].length; j++) {
+                iData[i][j] *= iData[i][j] | 0x88651430;
+                g.setColor(new Color(iData[i][j]));
+                g.fillRect(
+                        j * (pixelWidth + offSet),
+                        i * (pixelHeight + offSet),
+                        pixelWidth,
+                        pixelHeight
+                );
+            }
+        }
+    }
+    
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
 
         if (iData == null) {
+            super.paintComponent(g);
             return;
         }
+        
+        setSize(
+                iData[0].length * (pixelWidth + offSet),
+                iData.length * (pixelHeight + offSet)
+        );
+        super.paintComponent(g);
+        
         for (int i = 0; i < iData.length; i++) {
             for (int j = 0; j < iData[0].length; j++) {
                 g.setColor(new Color(iData[i][j]));
                 g.fillRect(
-                        j * pixelWidth,
-                        i * pixelHeight,
+                        j * (pixelWidth + offSet),
+                        i * (pixelHeight + offSet),
                         pixelWidth,
                         pixelHeight
                 );
@@ -96,11 +139,17 @@ public class mCanvas extends JPanel {
             }
 
             BufferedImage image = ImageIO.read(f);
-            iData = new int[image.getHeight()][image.getWidth()];
+            iData = new int[image.getHeight() + 2][image.getWidth() + 2];
 
+            for (int i = 0; i < iData.length; i++) {
+                for (int j = 0; j < iData[0].length; j++) {
+                    iData[i][j] = -1;
+                }
+            }
+            
             for (int x = 0; x < image.getHeight(); x++) {
                 for (int y = 0; y < image.getWidth(); y++) {
-                    iData[x][y] = image.getRGB(y, x);
+                    iData[x + 1][y + 1] = (image.getRGB(y, x) != -1) ? 0 : -1;
                 }
             }
         } catch (IOException ex) {
@@ -117,4 +166,19 @@ public class mCanvas extends JPanel {
     void zoomIn(int i) {
         setPixelSize(pixelWidth + i, pixelHeight + i);
     }
+
+    void cover() {
+        printMatrix();
+        OCRCore.cover(iData, 0x723478, 0);
+        repaint();
+    }
+    
+    public void mouseReleased(MouseEvent evt) {
+        int x = evt.getX() / (pixelWidth + offSet);
+        int y = evt.getY() / (pixelHeight + offSet);
+        
+        setPixel(y, x, 783456);
+        
+    }
+    
 }

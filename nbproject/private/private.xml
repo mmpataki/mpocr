@@ -5,6 +5,7 @@
         <group>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MainPage.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/mCanvas.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/OCRCore.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/BMPImageFilter.java</file>
         </group>
     </open-files>
