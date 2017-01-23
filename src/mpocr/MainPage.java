@@ -216,7 +216,11 @@ public class MainPage extends javax.swing.JFrame {
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+<<<<<<< HEAD
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+=======
+        } catch (Exception ex) {
+>>>>>>> 988824364e84e9c1fead5b2d090c7d67e34ecd01
             java.util.logging.Logger.getLogger(MainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         
