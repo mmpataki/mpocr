@@ -82,7 +82,7 @@ public class OCRCore {
         ArrayList<Degree> regionList = findRegions(canvas);
 
         canvas.printMatrix();
-        
+
         regionList.stream().forEach((is) -> {
             expand_region(canvas, is.regionNum, HOMOGENIOUS_EXPANSION);
         });
@@ -95,87 +95,88 @@ public class OCRCore {
     }
 
     private static void expand_rec(mCanvas c, int i, int j, int col, int type) {
-try {
-        if (i < 1 || j < 1 || i > (c.iData.length-2) || j > (c.iData[0].length-2) || c.iData[i][j] != 0) {
-            return;
-        }
-
-        /* trace the window and check where you can expand */
-        
-        int perp_indices[][] = {
-            {-1, 0},
-            {0, -1}, {0, 1},
-            {1, 0}
-        };
-
-        int diag_indices[][] = {
-            {-1, -1}, {-1, 1},
-            {1, -1}, {1, 1}
-        };
-
-        boolean color = true;
-        for (int k = 0; k < perp_indices.length; k++) {
-
-            int m = i + perp_indices[k][0];
-            int n = j + perp_indices[k][1];
-
-            if (c.iData[m][n] != 0 && c.iData[m][n] != col) {
-                color = false;
-                break;
+        try {
+            if (i < 2 || j < 2 || i > (c.iData.length - 4) || j > (c.iData[0].length - 4) || c.iData[i][j] != col) {
+                return;
             }
-        }
 
-        if (type == HOMOGENIOUS_EXPANSION) {
-            for (int k = 0; k < diag_indices.length; k++) {
+            /* trace the window and check where you can expand */
+            int indices[][] = {
+                {-1, 0},
+                {0, -1}, {0, 1},
+                {1, 0},
+                {-1, -1}, {-1, 1},
+                {1, -1}, {1, 1}
+            };
 
-                int m = i + diag_indices[k][0];
-                int n = j + diag_indices[k][1];
+            /* This array is a circular buffer holding indices in to
+             * the array named 'indices'
+             *
+             * This array is got by tracing the following from 6 to 3
+             * in circular fashion
+             *
+             *  4 0 5
+             *  1 X 2
+             *  6 3 7
+             *
+             */
+            int[] check_indices = {6, 1, 4, 0, 5, 2, 7, 3};
+            int m, n;
+            boolean color = true;
 
-                if (c.iData[m][n] != 0 && c.iData[m][n] != col) {
-                    color = false;
-                    break;
+            for (int k = 0; k < indices.length; k++) {
+
+                m = i + indices[k][0];
+                n = j + indices[k][1];
+
+                if (c.iData[m][n] == 0) {
+
+                    /* check the surroundings 5 pixels only */
+                    for (int l = 0; l < 5; l++) {
+
+                        int p = indices[check_indices[(m - i) * 3 + (n - j) + 4]][0];
+                        int q = indices[check_indices[(m - i) * 3 + (n - j) + 4]][1];
+
+                        if (c.iData[m + p][n + q] != 0) {
+                            /* every second element is corner one */
+                            if (type == HOMOGENIOUS_EXPANSION && (l % 2) == 0) {
+                                color = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (color) {
+
+                    c.iData[m][n] = col;
+
+                    c.printMatrix();
+
+                    expand_rec(c, m - 1, n - 1, col, type);
+                    expand_rec(c, m - 1, n, col, type);
+                    expand_rec(c, m - 1, n + 1, col, type);
+
+                    expand_rec(c, m, n - 1, col, type);
+                    expand_rec(c, m, n + 1, col, type);
+
+                    expand_rec(c, m + 1, n - 1, col, type);
+                    expand_rec(c, m + 1, n, col, type);
+                    expand_rec(c, m + 1, n + 1, col, type);
                 }
             }
+        } catch (Exception e) {
+            //System.out.println(e + " i : " + i + " j : " + j);
+            //e.printStackTrace();
         }
-
-        if (color) {
-
-            c.iData[i][j] = col;
-
-            c.printMatrix();
-            
-            expand_rec(c, i - 1, j - 1, col, type);
-            expand_rec(c, i - 1, j,     col, type);
-            expand_rec(c, i - 1, j + 1, col, type);
-
-            expand_rec(c, i,     j - 1, col, type);
-            expand_rec(c, i,     j + 1, col, type);
-
-            expand_rec(c, i + 1, j - 1, col, type);
-            expand_rec(c, i + 1, j,     col, type);
-            expand_rec(c, i + 1, j + 1, col, type);
-        }
-} catch(Exception e) {
-    System.out.println(e + " i : " + i + " j : " + j);
-}
     }
 
     private static void expand_region(mCanvas c, int rNum, int type) {
 
-        for (int i = 1; i < c.iData.length-2; i++) {
-            for (int j = 1; j < c.iData[0].length-2; j++) {
+        for (int i = 2; i < c.iData.length - 4; i++) {
+            for (int j = 2; j < c.iData[0].length - 4; j++) {
                 if (c.iData[i][j] == rNum) {
-
-                    expand_rec(c, i - 1, j - 1, rNum, type);
-                    expand_rec(c, i - 1, j, rNum, type);
-                    expand_rec(c, i - 1, j + 1, rNum, type);
-
-                    expand_rec(c, i, j - 1, rNum, type);
-                    expand_rec(c, i, j + 1, rNum, type);
-
-                    expand_rec(c, i + 1, j - 1, rNum, type);
-                    expand_rec(c, i + 1, j, rNum, type);
-                    expand_rec(c, i + 1, j + 1, rNum, type);
+                    expand_rec(c, i, j, rNum, type);
                 }
             }
         }
