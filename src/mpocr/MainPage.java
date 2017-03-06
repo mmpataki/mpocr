@@ -36,6 +36,7 @@ public class MainPage extends javax.swing.JFrame {
         Thin = new javax.swing.JButton();
         Cover = new javax.swing.JButton();
         hack = new javax.swing.JCheckBox();
+        CSkew = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -100,6 +101,13 @@ public class MainPage extends javax.swing.JFrame {
 
         hack.setText("Use Hack");
 
+        CSkew.setText("CSkew");
+        CSkew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CSkewActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -119,6 +127,8 @@ public class MainPage extends javax.swing.JFrame {
                         .addComponent(Cover)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(Thin)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CSkew)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ZoomOut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -151,7 +161,8 @@ public class MainPage extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(Cover)
-                            .addComponent(Thin))))
+                            .addComponent(Thin)
+                            .addComponent(CSkew))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -193,8 +204,8 @@ public class MainPage extends javax.swing.JFrame {
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
+        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/AZVF.bmp";
         if(hack.isSelected()) {
-        String path = "/home/mmp/miniproject/project/mpocr/testimages/A.bmp";
         canvas.setImage(path);
         canvas.setOffset(1);
         ImagePath.setText("Path : " + path);
@@ -202,10 +213,10 @@ public class MainPage extends javax.swing.JFrame {
         else {
         JFileChooser ch = new JFileChooser();
         ch.setFileFilter(new BMPImageFilter());
-
+        ch.setCurrentDirectory(new File(path));
         if(ch.showOpenDialog(MainPage.this) == JFileChooser.APPROVE_OPTION) {
             File file = ch.getSelectedFile();
-            String path = file.getAbsolutePath();
+            path = file.getAbsolutePath();
             canvas.setImage(path);
             canvas.setOffset(1);
             ImagePath.setText("Path : " + path);
@@ -213,14 +224,15 @@ public class MainPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ImportButtonActionPerformed
 
+    private void CSkewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CSkewActionPerformed
+        OCRCore.cskew(canvas);
+    }//GEN-LAST:event_CSkewActionPerformed
+
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-<<<<<<< HEAD
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-=======
         } catch (Exception ex) {
->>>>>>> 988824364e84e9c1fead5b2d090c7d67e34ecd01
             java.util.logging.Logger.getLogger(MainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         
@@ -231,6 +243,7 @@ public class MainPage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton CSkew;
     private javax.swing.JButton Cover;
     private javax.swing.JLabel ImagePath;
     private javax.swing.JButton ImportButton;

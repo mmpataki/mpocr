@@ -1,8 +1,12 @@
 package mpocr;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Pixel {
 
@@ -52,6 +56,48 @@ public class OCRCore {
     static final int HOMOGENIOUS_EXPANSION = 1;
     static final int HETEROGENIOUS_EXPANSION = 2;
 
+    static boolean[][] visited;
+
+    public static void cskew(mCanvas c) {
+
+        int[][] idata = c.iData;
+        int[] hist = new int[idata.length];
+        int max = 0;
+
+        for (int i = 0; i < idata.length; i++) {
+            int cnt = 0;
+            for (int j = 0; j < idata[i].length; j++) {
+                if (idata[i][j] != -1) {
+                    cnt++;
+                }
+            }
+            if(max < cnt)
+                max = cnt;
+            hist[i] = cnt;
+        }
+
+        histout(hist, max, 4);
+    }
+
+    private static void histout(int[] hist, int max, int factor) {
+        try {
+            PrintWriter pw = new PrintWriter("hist.html");
+            pw.append("<html><head><script src=\"mchartjs.js\"></script><link href=\"mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head>");
+            pw.append("<div class=\"mchart\" style='width: 90%; height: 90%' gdata='{\"type\": \"region\", \"ydivs\": " + (max/factor) + ", \"xdivs\": " + (hist.length/factor) + ", \"vgrids\": true, \"hgrids\": true, \"datasets\": [{\"fill\": \"skyblue\", \"data\": ");
+            pw.append(Arrays.toString(hist));
+            pw.append("}]}'></div></html>");
+            pw.flush();
+            try {
+                Process p = Runtime.getRuntime().exec("firefox hist.html");
+                p.waitFor();
+            } catch (IOException | InterruptedException e) {
+                System.out.println("firefox couldn't be opened");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(OCRCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     /* mCanvas is parameter as we want to color the canvas in runtime to analyze the algorithm */
     public static void thin1(mCanvas canvas) {
 
@@ -82,6 +128,7 @@ public class OCRCore {
         ArrayList<Degree> regionList = findRegions(canvas);
 
         canvas.printMatrix();
+        visited = new boolean[canvas.iData.length][canvas.iData[0].length];
 
         regionList.stream().forEach((is) -> {
             expand_region(canvas, is.regionNum, HOMOGENIOUS_EXPANSION);
@@ -96,33 +143,22 @@ public class OCRCore {
 
     private static void expand_rec(mCanvas c, int i, int j, int col, int type) {
         try {
-            if (i < 2 || j < 2 || i > (c.iData.length - 4) || j > (c.iData[0].length - 4) || c.iData[i][j] != col) {
+            if (i < 2 || j < 2 || i > (c.iData.length - 2) || j > (c.iData[0].length - 2) || c.iData[i][j] != col || visited[i][j]) {
                 return;
             }
 
+            visited[i][j] = true;
+
             /* trace the window and check where you can expand */
             int indices[][] = {
-                {-1, 0},
-                {0, -1}, {0, 1},
+                {-1, -1}, {-1, 0}, {-1, 1},
+                {0, 1},
+                {1, 1},
                 {1, 0},
-                {-1, -1}, {-1, 1},
-                {1, -1}, {1, 1}
+                {1, -1},
+                {0, -1}
             };
-
-            /* This array is a circular buffer holding indices in to
-             * the array named 'indices'
-             *
-             * This array is got by tracing the following from 6 to 3
-             * in circular fashion
-             *
-             *  4 0 5
-             *  1 X 2
-             *  6 3 7
-             *
-             */
-            int[] check_indices = {6, 1, 4, 0, 5, 2, 7, 3};
-            int m, n;
-            boolean color = true;
+            int m = 0, n = 0;
 
             for (int k = 0; k < indices.length; k++) {
 
@@ -131,51 +167,73 @@ public class OCRCore {
 
                 if (c.iData[m][n] == 0) {
 
-                    /* check the surroundings 5 pixels only */
-                    for (int l = 0; l < 5; l++) {
+                    int ncolors = 0, maxcolors = 4;
 
-                        int p = indices[check_indices[(m - i) * 3 + (n - j) + 4]][0];
-                        int q = indices[check_indices[(m - i) * 3 + (n - j) + 4]][1];
+                    if (type == HOMOGENIOUS_EXPANSION) {
+                        maxcolors = 3;
+                    }
 
-                        if (c.iData[m + p][n + q] != 0) {
-                            /* every second element is corner one */
-                            if (type == HOMOGENIOUS_EXPANSION && (l % 2) == 0) {
-                                color = false;
-                                break;
-                            }
+                    /* get the start of a color */
+                    int assumed_color = c.iData[m + indices[0][0]][n + indices[0][1]];
+                    int l;
+
+                    for (l = 0; l < 8; l++) {
+                        if (c.iData[m + indices[l][0]][n + indices[l][1]] != assumed_color) {
+                            break;
                         }
                     }
-                }
 
-                if (color) {
+                    /* Now count the number of color boundaries */
+                    assumed_color = -1;
+                    for (int h = 0; h < 8; h++) {
+                        int r = (h + l) % 8;
+                        r = c.iData[m + indices[r][0]][n + indices[r][1]];
+                        if (r != assumed_color) {
+                            assumed_color = r;
+                            ncolors++;
+                        }
+                    }
 
-                    c.iData[m][n] = col;
+                    /* Now check how many neighbours does it have if only
+                       one you cannot steal that point from image */
+                    int neighbours = 0;
+                    boolean continous = true;
+                    for (int o = 0; o < 8; o++) {
+                        if (c.iData[m + indices[o][0]][n + indices[o][1]] == 0) {
+                            neighbours++;
+                        }
+                    }
 
-                    c.printMatrix();
+                    if ((c.iData[m - 1][n] == 0 && c.iData[m + 1][n] == 0)
+                            || (c.iData[m][n - 1] == 0 && c.iData[m][n + 1] == 0)) {
+                        continous = false;
+                    }
 
-                    expand_rec(c, m - 1, n - 1, col, type);
-                    expand_rec(c, m - 1, n, col, type);
-                    expand_rec(c, m - 1, n + 1, col, type);
-
-                    expand_rec(c, m, n - 1, col, type);
-                    expand_rec(c, m, n + 1, col, type);
-
-                    expand_rec(c, m + 1, n - 1, col, type);
-                    expand_rec(c, m + 1, n, col, type);
-                    expand_rec(c, m + 1, n + 1, col, type);
+                    if (ncolors < maxcolors && neighbours > 1 && !continous) {
+                        c.iData[m][n] = col;
+                        c.printMatrix();
+                    }
                 }
             }
+            for (int k = 0; k < 8; k++) {
+                expand_rec(c, m + indices[k][0], n + indices[k][1], col, type);
+            }
+
         } catch (Exception e) {
-            //System.out.println(e + " i : " + i + " j : " + j);
-            //e.printStackTrace();
+            System.out.println(e);
         }
     }
 
     private static void expand_region(mCanvas c, int rNum, int type) {
 
-        for (int i = 2; i < c.iData.length - 4; i++) {
-            for (int j = 2; j < c.iData[0].length - 4; j++) {
-                if (c.iData[i][j] == rNum) {
+        for (boolean[] visited1 : visited) {
+            for (int j = 0; j < visited[0].length; j++) {
+                visited1[j] = false;
+            }
+        }
+        for (int i = 2; i < c.iData.length - 2; i++) {
+            for (int j = 2; j < c.iData[0].length - 2; j++) {
+                if (c.iData[i][j] == rNum && !visited[i][j]) {
                     expand_rec(c, i, j, rNum, type);
                 }
             }
@@ -215,141 +273,6 @@ public class OCRCore {
         floodFill(iData, i - 1, j, col, degree);
         floodFill(iData, i, j + 1, col, degree);
         floodFill(iData, i + 1, j, col, degree);
-    }
-
-    /*
-     * Thinning works as follows
-     * 
-     *
-     * 
-     */
-    public static void thin(int[][] iData, int mainCol, int markerCol) {
-
-        Pixel pixels[][] = new Pixel[iData.length][iData[0].length];
-
-        for (int i = 0; i < iData.length; i++) {
-            for (int j = 0; j < iData[0].length; j++) {
-                pixels[i][j] = new Pixel();
-            }
-        }
-
-        for (int i = 2; i < iData.length - 1; i++) {
-            for (int j = 0; j < iData[0].length - 1; j++) {
-                pixels[i - 1][j].horRem = (iData[i][j] == mainCol && iData[i - 1][j] == mainCol);
-            }
-        }
-
-        for (int i = 2; i < iData[0].length - 1; i++) {
-            for (int j = 0; j < iData.length - 1; j++) {
-                pixels[j][i - 1].verRem = (iData[j][i] == mainCol && iData[j][i - 1] == mainCol);
-            }
-        }
-
-        for (int i = 0; i < iData.length; i++) {
-            for (int j = 0; j < iData[0].length; j++) {
-                //if(pixels[i][j].horRem) iData[i][j] = 0x8000;
-                //if(pixels[i][j].verRem) iData[i][j] = 0x800000;
-                //if(pixels[i][j].horRem && pixels[i][j].verRem) iData[i][j] = 0x80;
-            }
-        }
-
-        if (iData == null) {
-            return;
-        }
-
-        for (int i = 1; i < iData.length - 1; i++) {
-            for (int j = 1; j < iData[0].length - 1; j++) {
-
-                if (pixels[i][j].horRem && pixels[i][j].verRem) {
-
-                    /*
-                    
-                    check if you remove this pixel does it affect the links 
-                    checking this is simple 
-                
-                    X X X
-                    X 1 0
-                    0 0 0
-                    
-                    ******
-                    ******
-                    **
-                    **
-                    ******
-                    ******
-
-                      **
-                     *
-                    **
-                     *
-                      **
-                    
-                    
-                
-                    You have to just check the connectivity of the pixels labelled
-                    as 'X'. with far pixels.
-                
-                    Below is the 2D array where indices indicate node being
-                    checked if the node contains -2 as first value don't check
-                    else you have to check and if the correponding pixels to be
-                    checked are of required color then you cannot remove that
-                    pixel break else continue
-                     */
-                    boolean remove = true;
-
-                    int index_dictionary[][] = {
-                        {-1, -1}, {-1, 0}, {-1, 1},
-                        {0, -1}, {0, 0}, {0, 1},
-                        {1, -1}, {1, 0}, {1, 1}
-                    };
-
-                    int check_indices[][] = {
-                        {2, 5, 6, 7, 8},
-                        {6, 7, 8, -1, -1},
-                        {0, 3, 6, 7, 8},
-                        {2, 5, 8, -1, -1}
-                    };
-                    /*
-                    int check_indices[][] = {
-                        {5, 7, 8},//{2, 5, 6, 7, 8},
-                        {6, 7, 8},//{6, 7, 8,-1,-1},
-                        {3, 6, 7},//{0, 3, 6, 7, 8},
-                        {2, 5, 8} //{2, 5, 8,-1,-1}
-                    };
-                     */
-
-                    for (int k = 0; k < check_indices.length; k++) {
-
-                        int m = i + index_dictionary[k][0];
-                        int n = j + index_dictionary[k][1];
-
-                        if (iData[m][n] == mainCol) {
-
-                            for (int l = 0; l < check_indices[0].length; l++) {
-
-                                if (check_indices[k][l] == -1) {
-                                    continue;
-                                }
-                                int p = i + index_dictionary[check_indices[k][l]][0];
-                                int q = i + index_dictionary[check_indices[k][l]][1];
-
-                                if (iData[p][q] == mainCol) {
-                                    remove = false;
-                                    break;
-                                }
-                            }
-                            if (!remove) {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (remove) {
-                        iData[i][j] = markerCol;
-                    }
-                }
-            }
-        }
     }
 
     public static void cover(int[][] iData, int markerCol, int mainCol) {

@@ -141,15 +141,13 @@ public class mCanvas extends JPanel {
             BufferedImage image = ImageIO.read(f);
             iData = new int[image.getHeight() + 2][image.getWidth() + 2];
 
-            for (int i = 0; i < iData.length; i++) {
-                for (int j = 0; j < iData[0].length; j++) {
-                    iData[i][j] = -1;
-                }
-            }
-            
             for (int x = 0; x < image.getHeight(); x++) {
                 for (int y = 0; y < image.getWidth(); y++) {
-                    iData[x + 1][y + 1] = (image.getRGB(y, x) != -1) ? 0 : -1;
+                    int c = (image.getRGB(y, x));
+                    int r = (c & 0xff);
+                    int g = (c & 0xff00) >> 8;
+                    int b = (c & 0xff0000) >> 16;
+                    iData[x + 1][y + 1] = (((r+g+b)/3) > 128) ? 0 : -1;
                 }
             }
         } catch (IOException ex) {
