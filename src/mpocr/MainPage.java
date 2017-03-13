@@ -204,8 +204,9 @@ public class MainPage extends javax.swing.JFrame {
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
-        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/AZVF.bmp";
-        if(hack.isSelected()) {
+        //String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/AZVF.bmp";
+        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
+        if(!hack.isSelected()) {
         canvas.setImage(path);
         canvas.setOffset(1);
         ImagePath.setText("Path : " + path);

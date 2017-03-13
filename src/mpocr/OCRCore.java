@@ -57,6 +57,8 @@ public class OCRCore {
     static final int HETEROGENIOUS_EXPANSION = 2;
 
     static boolean[][] visited;
+    private static int NREVERSE = 0;
+    private static int REVERSE = 0;
 
     public static void cskew(mCanvas c) {
 
@@ -64,26 +66,112 @@ public class OCRCore {
         int[] hist = new int[idata.length];
         int max = 0;
 
+        removeIntersection(idata);
+        c.iData = rotate(idata, -20);
+        c.redraw();
+        c.printMatrix();
+        
+        for (int k = 0; k < 45; k++) {
+            
+            for (int i = 0; i < idata.length; i++) {
+                int cnt = 0;
+                for (int j = 0; j < idata[i].length; j++) {
+                    if (idata[i][j] != -1) {
+                        cnt++;
+                    }
+                }
+                if (max < cnt) {
+                    max = cnt;
+                }
+                hist[i] = cnt;
+            }
+        }
+        //histout(hist, max, 4);
+    }
+    
+    private static int[][] rotate(int[][] idata, int deg) {
+        
+        
+        double m = (double)Math.tan((double)deg * Math.PI / 180);
+        double am = Math.abs(m);
+        int mx = (int)Math.ceil((double)1/am * idata[0].length);
+        int my = (int)Math.ceil((double)1/am * idata.length);
+        
+        System.out.println(mx + ", " + my);
+        System.out.println(idata[0].length + ", " + idata.length);
+        
+        int[][] cp = new int[my][mx];
+
+        for (int i = 0; i < my; i++) {
+            for (int j = 0; j < mx; j++) {
+                cp[i][j] = 0;
+            }
+        }
+        int yc = getYIntersection(idata, REVERSE);
+        //System.out.println("yc " + yc);
         for (int i = 0; i < idata.length; i++) {
-            int cnt = 0;
-            for (int j = 0; j < idata[i].length; j++) {
-                if (idata[i][j] != -1) {
-                    cnt++;
+            int y = 0, x = 0;
+            int offset = (int)(am * i + yc);
+            //System.out.println("offset " + offset);
+            do {
+                cp[i][x] = idata[y][x];
+                x++;
+                y  = (int)Math.round(m * x + i);
+            } while(y < idata.length && y > -1 && x < idata[0].length);
+            
+            for (int k=0, j = offset; j < cp[0].length; j++) {
+                if(j > -1) {
+                    cp[i][k++] = cp[i][j];
                 }
             }
-            if(max < cnt)
-                max = cnt;
-            hist[i] = cnt;
         }
-
-        histout(hist, max, 4);
+        
+        
+        return cp;
     }
-
+    
+    private static void removeIntersection(int[][] idata) {
+        
+        /* find x & y intersection */
+        int yc = getXIntersection(idata, NREVERSE);
+        int xc = getYIntersection(idata, NREVERSE);
+        
+        System.out.println(xc + ", " + yc);
+        
+        for (int i = 0, ic = yc; ic < idata.length; i++, ic++) {
+            for (int j = 0, jc = xc; jc < idata[0].length; j++, jc++) {
+                idata[i][j] = idata[ic][jc];
+            }
+        }
+    }
+    
+    private static int getYIntersection(int[][] idata, int type) {
+        for (int i = 0; i < idata[0].length; i++) {
+            for (int j = 0; j < idata.length; j++) {
+                if(idata[j][i] != 0) {
+                    return type == NREVERSE ? i : j;
+                }
+            }
+        }
+        return 0;
+    }
+    
+    private static int getXIntersection(int[][] idata, int type) {
+        for (int i = 0; i < idata.length; i++) {
+            for (int j = 0; j < idata[0].length; j++) {
+                if(idata[i][j] != 0) {
+                    return type != NREVERSE ? i : j;
+                }
+            }
+        }
+        return 0;
+    }
+    
     private static void histout(int[] hist, int max, int factor) {
         try {
             PrintWriter pw = new PrintWriter("hist.html");
             pw.append("<html><head><script src=\"mchartjs.js\"></script><link href=\"mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head>");
-            pw.append("<div class=\"mchart\" style='width: 90%; height: 90%' gdata='{\"type\": \"region\", \"ydivs\": " + (max/factor) + ", \"xdivs\": " + (hist.length/factor) + ", \"vgrids\": true, \"hgrids\": true, \"datasets\": [{\"fill\": \"skyblue\", \"data\": ");
+            pw.append("<div class=\"mchart\" style='width: 90%; height: 90%' gdata='{\"type\": \"region\", \"ydivs\": " + (max / factor) + ", \"xdivs\": " + (hist.length / factor) + ", \"vgrids\": true, \"hgrids\": true, \"datasets\": [{\"fill\": \"skyblue\", \"data\": ");
             pw.append(Arrays.toString(hist));
             pw.append("}]}'></div></html>");
             pw.flush();
