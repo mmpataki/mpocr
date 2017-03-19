@@ -60,33 +60,52 @@ public class OCRCore {
     private static int NREVERSE = 0;
     private static int REVERSE = 0;
 
+    public static ArrayList<Segment> getSegments(mCanvas c) {
+        
+        ArrayList<Segment> segs = new ArrayList<>();
+        int[] hist = getHist(c.iData);
+        Stat r =  new Stat(hist);
+        int idata[][] = c.iData;
+        System.out.println(r);
+        
+        
+        
+        return segs;
+    }
+    
+    private static int minArray(int[] hist) {
+        int min = hist[0];
+        for (int i = 1; i < hist.length; i++) {
+            if(min > hist[i]) {
+                min = hist[i];
+            }
+        }
+        return min;
+    }
+    
     public static void cskew(mCanvas c) {
-
         int[][] idata = c.iData;
-        int[] hist = new int[idata.length];
-        int max = 0;
-
         removeIntersection(idata);
         c.iData = rotate(idata, -20);
         c.redraw();
         c.printMatrix();
-        
-        for (int k = 0; k < 45; k++) {
-            
+    }
+    
+    public static int[] getHist(int[][] idata) {
+        int max = 0, hist[] = new int[idata.length];
+        for (int k = 0; k < 45; k++) {    
             for (int i = 0; i < idata.length; i++) {
                 int cnt = 0;
                 for (int j = 0; j < idata[i].length; j++) {
-                    if (idata[i][j] != -1) {
-                        cnt++;
-                    }
+                    if (idata[i][j] != 0) cnt++;
                 }
-                if (max < cnt) {
+                if (max < cnt)
                     max = cnt;
-                }
                 hist[i] = cnt;
             }
         }
-        //histout(hist, max, 4);
+        histout(hist, max, 4);
+        return hist;
     }
     
     private static int[][] rotate(int[][] idata, int deg) {

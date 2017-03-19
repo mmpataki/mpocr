@@ -56,6 +56,10 @@
                           <Component id="Thin" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="CSkew" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="histogram" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="Segment" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                           <Component id="ZoomOut" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -100,6 +104,8 @@
                               <Component id="Cover" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="Thin" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="CSkew" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="histogram" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="Segment" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -220,6 +226,22 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CSkewActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="histogram">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Histogram"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="histogramActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="Segment">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Segment"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SegmentActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

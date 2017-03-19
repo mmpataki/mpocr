@@ -1,6 +1,7 @@
 package mpocr;
 
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -37,6 +38,8 @@ public class MainPage extends javax.swing.JFrame {
         Cover = new javax.swing.JButton();
         hack = new javax.swing.JCheckBox();
         CSkew = new javax.swing.JButton();
+        histogram = new javax.swing.JButton();
+        Segment = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -108,6 +111,20 @@ public class MainPage extends javax.swing.JFrame {
             }
         });
 
+        histogram.setText("Histogram");
+        histogram.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                histogramActionPerformed(evt);
+            }
+        });
+
+        Segment.setText("Segment");
+        Segment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SegmentActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -129,6 +146,10 @@ public class MainPage extends javax.swing.JFrame {
                         .addComponent(Thin)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(CSkew)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(histogram)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Segment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ZoomOut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -162,7 +183,9 @@ public class MainPage extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(Cover)
                             .addComponent(Thin)
-                            .addComponent(CSkew))))
+                            .addComponent(CSkew)
+                            .addComponent(histogram)
+                            .addComponent(Segment))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -205,7 +228,8 @@ public class MainPage extends javax.swing.JFrame {
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
         //String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/AZVF.bmp";
-        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
+        //String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
+        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/unskewedLorem.bmp";
         if(!hack.isSelected()) {
         canvas.setImage(path);
         canvas.setOffset(1);
@@ -229,6 +253,17 @@ public class MainPage extends javax.swing.JFrame {
         OCRCore.cskew(canvas);
     }//GEN-LAST:event_CSkewActionPerformed
 
+    private void histogramActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramActionPerformed
+        OCRCore.getHist(canvas.iData);
+    }//GEN-LAST:event_histogramActionPerformed
+
+    private void SegmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SegmentActionPerformed
+        ArrayList<Segment> segs = OCRCore.getSegments(canvas);
+        segs.stream().forEach((Segment seg) -> {
+            seg.printSeg();
+        });
+    }//GEN-LAST:event_SegmentActionPerformed
+
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -248,11 +283,13 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JButton Cover;
     private javax.swing.JLabel ImagePath;
     private javax.swing.JButton ImportButton;
+    private javax.swing.JButton Segment;
     private javax.swing.JButton Thin;
     private javax.swing.JButton ZoomIn;
     private javax.swing.JButton ZoomOut;
     private mpocr.mCanvas canvas;
     private javax.swing.JCheckBox hack;
+    private javax.swing.JButton histogram;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
