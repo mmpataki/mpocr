@@ -11,7 +11,7 @@ public class MainPage extends javax.swing.JFrame {
 
     public MainPage() {
         initComponents();
-        canvas.zoomIn(10);
+        canvas.zoomIn(1);
     }
 
     /**
@@ -227,12 +227,12 @@ public class MainPage extends javax.swing.JFrame {
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
-        //String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/AZVF.bmp";
-        //String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
-        String path = "/home/mmp/Desktop/miniproject/project/mpocr/testimages/unskewedLorem.bmp";
+      //String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
+      String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
+      //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";
         if(!hack.isSelected()) {
         canvas.setImage(path);
-        canvas.setOffset(1);
+        canvas.setOffset(0);
         ImagePath.setText("Path : " + path);
         }
         else {

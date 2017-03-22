@@ -1,5 +1,9 @@
+package mpocr;
+
 class Segmentation {
 
-	static Segement[] segmentImage(OImage oi);
+	static Segment[] segmentImage(OImage oi) {
+            return null;
+        }
 
 }
