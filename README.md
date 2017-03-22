@@ -1,6 +1,6 @@
 # mpocr
 a undergraduate level OCR project
 
-##Contributors
+## Contributors
 * Madhusoodan
 * Anarghya J
