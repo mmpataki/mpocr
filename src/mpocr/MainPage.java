@@ -260,7 +260,7 @@ public class MainPage extends javax.swing.JFrame {
     private void SegmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SegmentActionPerformed
         ArrayList<Segment> segs = OCRCore.getSegments(canvas);
         segs.stream().forEach((Segment seg) -> {
-            seg.printSeg();
+            seg.printimage();
         });
     }//GEN-LAST:event_SegmentActionPerformed
 
