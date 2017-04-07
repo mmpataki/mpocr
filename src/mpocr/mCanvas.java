@@ -43,9 +43,9 @@ public class mCanvas extends JPanel {
             System.out.println();
             for (int j = 0; j < iData[0].length; j++) {
                 if(iData[i][j] == 0) {
-                    System.out.print("#  ");
+                    System.out.print("#");
                 } else {
-                    System.out.print(iData[i][j] + ", ");
+                    System.out.print((iData[i][j] == -1 ? 1 : 0) + "");
                 }
             }
         }
@@ -122,7 +122,6 @@ public class mCanvas extends JPanel {
                 );
             }
         }
-
     }
 
     void setImage(String path) {
@@ -174,9 +173,6 @@ public class mCanvas extends JPanel {
     public void mouseReleased(MouseEvent evt) {
         int x = evt.getX() / (pixelWidth + offSet);
         int y = evt.getY() / (pixelHeight + offSet);
-        
         setPixel(y, x, 783456);
-        
     }
-    
 }

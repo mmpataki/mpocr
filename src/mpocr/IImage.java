@@ -1,3 +1,5 @@
+package mpocr;
+
 interface IImage {
 
 	/* for getting the height and width of the image */
@@ -7,9 +9,6 @@ interface IImage {
 
 	/* to get access to the image's RGB data */
 	int[][] getImageData();
-
-	/* to rotate the image to given degree */
-	void rotate(double degree);
 
 	/* to get the foreground and background color of the image */
 	int getForeground();

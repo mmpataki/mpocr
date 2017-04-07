@@ -1,13 +1,15 @@
-class Segment implements IImage {
+package mpocr;
 
-	int[][] segdata;
-	FeatureSet features;
-	
-	/* from the IImage interface */
-	int[][] getImageData();
-	int getWidth();
-	int getHeight();
-	int getForeground();
-	int getBackground();
+/**
+ * 
+ * @author mmp
+ */
 
+class Segment extends BasicImage {
+
+    FeatureSet features;
+    
+    public Segment(int[][] iData) {
+        super(iData);
+    }
 }

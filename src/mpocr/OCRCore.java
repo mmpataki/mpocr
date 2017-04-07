@@ -58,7 +58,7 @@ public class OCRCore {
 
     static boolean[][] visited;
     private static int NREVERSE = 0;
-    private static int REVERSE = 0;
+    private static int REVERSE = 1;
 
     public static ArrayList<Segment> getSegments(mCanvas c) {
         
@@ -67,9 +67,6 @@ public class OCRCore {
         Stat r =  new Stat(hist);
         int idata[][] = c.iData;
         System.out.println(r);
-        
-        
-        
         return segs;
     }
     
@@ -108,13 +105,13 @@ public class OCRCore {
         return hist;
     }
     
-    private static int[][] rotate(int[][] idata, int deg) {
+    private static int[][] rotate(int[][] idata, double deg) {
         
         
-        double m = (double)Math.tan((double)deg * Math.PI / 180);
+        double m = (double)Math.tan(deg * Math.PI / 180);
         double am = Math.abs(m);
-        int mx = (int)Math.ceil((double)1/am * idata[0].length);
-        int my = (int)Math.ceil((double)1/am * idata.length);
+        int mx = (int)Math.round((double)1/am * idata[0].length);
+        int my = (int)Math.round((double)1/am * idata.length);
         
         System.out.println(mx + ", " + my);
         System.out.println(idata[0].length + ", " + idata.length);
@@ -126,25 +123,15 @@ public class OCRCore {
                 cp[i][j] = 0;
             }
         }
-        int yc = getYIntersection(idata, REVERSE);
-        //System.out.println("yc " + yc);
-        for (int i = 0; i < idata.length; i++) {
-            int y = 0, x = 0;
-            int offset = (int)(am * i + yc);
-            //System.out.println("offset " + offset);
+        int yc = getXIntersection(idata, REVERSE);
+        for (int i = yc; i < idata.length; i++) {
+            int y = 0, x = (int)(am * (i-yc)), ax = 0;
             do {
-                cp[i][x] = idata[y][x];
+                cp[i][ax++] = idata[y][x];
                 x++;
                 y  = (int)Math.round(m * x + i);
             } while(y < idata.length && y > -1 && x < idata[0].length);
-            
-            for (int k=0, j = offset; j < cp[0].length; j++) {
-                if(j > -1) {
-                    cp[i][k++] = cp[i][j];
-                }
-            }
         }
-        
         
         return cp;
     }
@@ -152,22 +139,22 @@ public class OCRCore {
     private static void removeIntersection(int[][] idata) {
         
         /* find x & y intersection */
-        int yc = getXIntersection(idata, NREVERSE);
-        int xc = getYIntersection(idata, NREVERSE);
+        int xc = getXIntersection(idata, NREVERSE);
+        int yc = getYIntersection(idata, NREVERSE);
         
-        System.out.println(xc + ", " + yc);
+        System.out.println(xc + ", " + yc + " " + idata.length);
         
-        for (int i = 0, ic = yc; ic < idata.length; i++, ic++) {
-            for (int j = 0, jc = xc; jc < idata[0].length; j++, jc++) {
+        for (int i = 1, ic = yc; ic < idata.length; i++, ic++) {
+            for (int j = 10, jc = xc; jc < idata[0].length; j++, jc++) {
                 idata[i][j] = idata[ic][jc];
             }
         }
     }
     
     private static int getYIntersection(int[][] idata, int type) {
-        for (int i = 0; i < idata[0].length; i++) {
-            for (int j = 0; j < idata.length; j++) {
-                if(idata[j][i] != 0) {
+        for (int i = 0; i < idata.length; i++) {
+            for (int j = 0; j < idata[0].length; j++) {
+                if(idata[i][j] != 0) {
                     return type == NREVERSE ? i : j;
                 }
             }
@@ -176,10 +163,10 @@ public class OCRCore {
     }
     
     private static int getXIntersection(int[][] idata, int type) {
-        for (int i = 0; i < idata.length; i++) {
-            for (int j = 0; j < idata[0].length; j++) {
-                if(idata[i][j] != 0) {
-                    return type != NREVERSE ? i : j;
+        for (int i = 0; i < idata[0].length; i++) {
+            for (int j = 0; j < idata.length; j++) {
+                if(idata[j][i] != 0) {
+                    return type == NREVERSE ? i : j;
                 }
             }
         }
