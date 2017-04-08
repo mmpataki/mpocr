@@ -7,7 +7,7 @@ class BasicImage implements IImage {
 
     protected int[][] iData;
     /* to check if the buffer 'iData' is dirty. */
-    private boolean dirty = false;
+    boolean dirty = false;
 
     /*
      * constructor for initialising the image.
@@ -25,18 +25,18 @@ class BasicImage implements IImage {
     /* for getting the height and width of the image */
     @Override
     public int getWidth() {
-        return iData.length;
+        return iData[0].length;
     }
 
     @Override
     public int getHeight() {
-        return iData[0].length;
+        return iData.length;
     }
 
     /* to get the foreground and background color of the image */
     @Override
     public int getForeground() {
-        return 1;
+        return -1;
     }
 
     @Override
@@ -53,9 +53,10 @@ class BasicImage implements IImage {
         for (int[] row : iData) {
             Util.puts("\n");
             for (int j = 0; j < iData[0].length; j++) {
-                Util.puts(row[j] + "");
+                Util.puts(row[j] == getBackground() ? "." : "#");
             }
         }
+        Util.puts("\n");
     }
     
     private static final int NREVERSE = 0;

@@ -34,28 +34,33 @@ class Segmentation {
         int i = 0, j;
         double excuse = 0;
         
-        while(i < idata.length) {
+        int iht = idata.length - 1;
+        int iwd = idata[0].length - 1;
+        while(i < iht) {
             
             /* skip the upper empty lines. */
-            while(i < idata.length && isemptyLine(idata[i], fg, excuse)) i++;
+            while(i < iht && isemptyLine(idata[i], fg, excuse)) i++;
             up = i - 1;
-            while(i < idata.length && !isemptyLine(idata[i], fg, excuse)) i++;
+            while(i < iht && !isemptyLine(idata[i], fg, excuse)) i++;
             down = i;
             
             j = 0;
             
             /* get the segments in the line range up <-> down */
-            while(j < idata[i].length) {
+            while(j < iwd) {
                 
                 /* skip the left empty lines. */
-                while(j < idata[i].length && isemptyCol(idata, up, down, j, fg, excuse)) j++;
+                while(j < iwd && isemptyCol(idata, up, down, j, fg, excuse)) j++;
                 left = j - 1;
-                while(j < idata[i].length && !isemptyCol(idata, up, down, j, fg, excuse)) j++;
+                while(j < iwd && !isemptyCol(idata, up, down, j, fg, excuse)) j++;
                 right = j;
                 
-                Segment seg = new Segment(new int[down - up + 2][right - left + 2]);
-                for (int k = up; k < down; k++) {
-                    System.arraycopy(idata[k], left, seg.iData[k+1], left + 1, right - left);
+                /* why +1 and not +2 as other images? answer is down-up and
+                 * right-left yeild +1 for the expression
+                 */
+                Segment seg = new Segment(new int[down - up + 1][right - left + 1]);
+                for (int k = up + 1; k < down; k++) {
+                    System.arraycopy(idata[k], left + 1, seg.iData[k - up], 1, (right - left - 1));
                 }
                 alist.add(seg);
             }
@@ -64,7 +69,8 @@ class Segmentation {
         
         Segment segs[] = new Segment[alist.size()];
         for (int k = 0; k < segs.length; k++) {
-            segs[k] = alist.get(i);
+            segs[k] = alist.get(k);
+            segs[k].printImage();
         }
         alist.clear();
         return segs;
@@ -93,7 +99,7 @@ class Segmentation {
         int fgs = 0;
         excuse /= 100.0;
         for (int i = up; i < down; i++) {
-            if(idata[up][col] == fg) {
+            if(idata[i][col] == fg) {
                 fgs++;
             }
         }

@@ -3,25 +3,22 @@ package mpocr;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class mCanvas extends JPanel {
 
+    /* image associated with this mCanvas */
+    OImage oimg;
+    /* pointer just pointing to the image data of oimg */
     int[][] iData;
     int pixelWidth = 1, pixelHeight = 1, offSet = 0;
 
     public mCanvas() {
-        iData = null;
+        oimg = null;
     }
 
     public mCanvas(String file) {
-        readImage(file);
+        setImage(file);
     }
 
     public void setPixelSize(int width, int height) {
@@ -39,24 +36,13 @@ public class mCanvas extends JPanel {
     }
 
     public void printMatrix() {
-        for (int i = 0; i < iData.length; i++) {
-            System.out.println();
-            for (int j = 0; j < iData[0].length; j++) {
-                if(iData[i][j] == 0) {
-                    System.out.print("#");
-                } else {
-                    System.out.print((iData[i][j] == -1 ? 1 : 0) + "");
-                }
-            }
-        }
-        System.out.println();
+        oimg.printimage();
     }
 
     public void thin() {
-        if(iData == null)
+        if(oimg == null)
             return;
-        OCRCore.thin1(this);
-        redraw();
+        OCRCore.thin1(this); redraw();
     }
     
     public void setOffset(int offset) {
@@ -124,34 +110,10 @@ public class mCanvas extends JPanel {
         }
     }
 
-    void setImage(String path) {
-        readImage(path);
+    final void setImage(String path) {
+        oimg = new OImage(path);
+        this.iData = oimg.getImageData();
         repaint();
-    }
-
-    private void readImage(String file) {
-        try {
-
-            File f = new File(file);
-            if (!f.exists()) {
-                return;
-            }
-
-            BufferedImage image = ImageIO.read(f);
-            iData = new int[image.getHeight() + 2][image.getWidth() + 2];
-
-            for (int x = 0; x < image.getHeight(); x++) {
-                for (int y = 0; y < image.getWidth(); y++) {
-                    int c = (image.getRGB(y, x));
-                    int r = (c & 0xff);
-                    int g = (c & 0xff00) >> 8;
-                    int b = (c & 0xff0000) >> 16;
-                    iData[x + 1][y + 1] = (((r+g+b)/3) > 128) ? 0 : -1;
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(mCanvas.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     void zoomOut(int i) {
@@ -174,5 +136,10 @@ public class mCanvas extends JPanel {
         int x = evt.getX() / (pixelWidth + offSet);
         int y = evt.getY() / (pixelHeight + offSet);
         setPixel(y, x, 783456);
+    }
+
+    void binarize() {
+        oimg.binarize();
+        repaint();
     }
 }

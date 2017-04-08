@@ -102,6 +102,7 @@ public class MainPage extends javax.swing.JFrame {
             }
         });
 
+        hack.setSelected(true);
         hack.setText("Use Hack");
 
         CSkew.setText("CSkew");
@@ -227,10 +228,13 @@ public class MainPage extends javax.swing.JFrame {
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
-      //String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
-      String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
-      //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";
-        if(!hack.isSelected()) {
+        String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed.jpeg"; //full noisy, small font
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed1.png";   //less noisy
+        
+        if(hack.isSelected()) {
         canvas.setImage(path);
         canvas.setOffset(0);
         ImagePath.setText("Path : " + path);
@@ -258,17 +262,18 @@ public class MainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_histogramActionPerformed
 
     private void SegmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SegmentActionPerformed
-        ArrayList<Segment> segs = OCRCore.getSegments(canvas);
-        segs.stream().forEach((Segment seg) -> {
+        canvas.binarize();
+        Segment[] segs = Segmentation.segmentImage(canvas.oimg);
+        for (Segment seg : segs) {
             seg.printimage();
-        });
+            seg.extractFeatures();
+        }
     }//GEN-LAST:event_SegmentActionPerformed
 
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-        } catch (Exception ex) {
             java.util.logging.Logger.getLogger(MainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         
