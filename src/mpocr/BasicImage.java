@@ -25,7 +25,7 @@ class BasicImage implements IImage {
     /* for getting the height and width of the image */
     @Override
     public int getWidth() {
-        return iData[0].length;
+        return iData.length > 0 ? iData[0].length : 0;
     }
 
     @Override

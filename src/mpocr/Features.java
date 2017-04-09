@@ -14,6 +14,10 @@ import java.util.HashMap;
 public class Features {
     
     private HashMap<Integer, FeatureSet> features;
+
+    public Features() {
+        features = new HashMap<>();
+    }
     
     public void add(FeatureSet set) {
         features.put(set.getmagic(), set);

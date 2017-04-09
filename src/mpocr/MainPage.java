@@ -264,9 +264,10 @@ public class MainPage extends javax.swing.JFrame {
     private void SegmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SegmentActionPerformed
         canvas.binarize();
         Segment[] segs = Segmentation.segmentImage(canvas.oimg);
-        for (Segment seg : segs) {
+        for (Segment seg: segs) {
             seg.printimage();
-            seg.extractFeatures();
+            seg.segmentImage();
+            seg.features.get(Zones.magic).printFeatures();
         }
     }//GEN-LAST:event_SegmentActionPerformed
 

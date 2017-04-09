@@ -51,7 +51,7 @@ class OImage extends BasicImage {
     }
     
     /* to binarize the image */
-    public void xbinarize() {
+    public void binarize() {
         for (int i = 1; i < getHeight() - 1; i++) {
             for (int j = 1; j < getWidth() - 1; j++) {
                 int c = iData[i][j];
@@ -65,7 +65,7 @@ class OImage extends BasicImage {
     }
 
     /* to binarize the image */
-    public void binarize() {
+    public void xbinarize() {
         /* first we need to convert image to grayscale*/
         dirty = true;
         grayscale();

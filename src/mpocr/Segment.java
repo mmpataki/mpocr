@@ -1,7 +1,5 @@
 package mpocr;
 
-import java.util.Stack;
-
 /**
  * 
  * @author mmp
@@ -13,6 +11,7 @@ class Segment extends BasicImage {
     
     public Segment(int[][] iData) {
         super(iData);
+        features = new Features();
     }
     
     public void printImage() {
@@ -20,7 +19,8 @@ class Segment extends BasicImage {
         super.printimage();
         for (int i = 0; i < getWidth(); i++)Util.puts("-"); Util.puts("\n");
     }
-    
-    
-    
+
+    void segmentImage() {
+        features.add(new Zones(this));
+    }
 }

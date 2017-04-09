@@ -17,4 +17,7 @@ public interface IFeatureSet {
     /* return comparison percentage of the two FeatureSet */
     public double compare(FeatureSet fs1, FeatureSet fs2);
     
+    /* to print features */
+    public void printFeatures();
+    
 }
