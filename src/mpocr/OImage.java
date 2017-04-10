@@ -1,3 +1,4 @@
+
 package mpocr;
 
 import java.awt.image.BufferedImage;
@@ -18,12 +19,18 @@ class OImage extends BasicImage {
         
         readImage(imgpath);
         
-        iData = new int[iData.length + 2][iData[0].length + 2];
-        for (int x = 0; x < iData.length; x++) {
-            for (int y = 0; y < iData[0].length; y++) {
+        iData = new int[img.getHeight() + 2][img.getWidth() + 2];
+        for (int x = 0; x < img.getHeight(); x++) {
+            for (int y = 0; y < img.getWidth(); y++) {
                 int c = (img.getRGB(y, x));
                 iData[x + 1][y + 1] = c;
             }
+        }
+        for (int[] iData1 : iData) {
+            iData1[0] = iData1[iData[0].length-1] = 0;
+        }
+        for (int j = 0; j < iData[0].length; j++) {
+            iData[0][j] = iData[iData.length-1][j] = 0;    
         }
     }
 
@@ -46,8 +53,8 @@ class OImage extends BasicImage {
     
     /* to binarize the image */
     public void binarize() {
-        for (int i = 1; i < getHeight(); i++) {
-            for (int j = 1; j < getWidth(); j++) {
+        for (int i = 1; i < getHeight() - 1; i++) {
+            for (int j = 1; j < getWidth() - 1; j++) {
                 int c = iData[i][j];
                 int r = (c & 0xff);
                 int g = (c & 0xff00) >> 8;
@@ -58,9 +65,126 @@ class OImage extends BasicImage {
         binarized = true;
     }
 
+    /* to binarize the image */
+    public void xbinarize() {
+        /* first we need to convert image to grayscale*/
+        dirty = true;
+        grayscale();
+        exportImage("gray.jpg");//Testing grayscale image formed
+        int newPixel;
+        int threshold = Threshold();
+        int height = getHeight();
+        int width = getWidth();
+        int redColor,alpha;
+        for(int i=1; i<width-1; i++) {
+        for(int j=1; j<height-1; j++) {
+            redColor=(iData[i][j] & 0xff);
+            if(redColor>threshold)newPixel=255;
+            else
+                newPixel=0;
+            
+            newPixel = colorToRGB(0,newPixel, newPixel, newPixel);
+            iData[i][j]=newPixel;
+            
+        }
+        }
+        
+ 
+        binarized = true;
+        Util.puts(threshold + "");
+        exportImage("binarized.jpg");
+    }
+    //Conversion to RGB ColorSpace
+    private  int colorToRGB(int alpha, int red, int green, int blue) {
+ 
+        int newPixel = 0;
+        newPixel += alpha;
+        newPixel = newPixel << 8;
+        newPixel += red; newPixel = newPixel << 8;
+        newPixel += green; newPixel = newPixel << 8;
+        newPixel += blue;
+ 
+        return newPixel;
+ 
+    }
+
+    private int Threshold() {
+        
+        int[] histogram = imageHistogram();
+        int width=getWidth(),height=getHeight();
+        int total =width * height;
+
+        float sum = 0;
+        for (int i = 0; i < 256; i++)
+            sum += i * histogram[i];
+
+        float sumB = 0;
+        int wB = 0;
+        int wF;
+        float varMax = 0;
+        int threshold = 0;
+
+        for (int i = 0; i < 256; i++) {
+            
+            wB += histogram[i];
+            if (wB == 0)
+                continue;
+            wF = total - wB;
+
+            if (wF == 0)
+                break;
+
+            sumB += (float) (i * histogram[i]);
+            float mB = sumB / wB;
+            float mF = (sum - sumB) / wF;
+
+            float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
+
+            if (varBetween > varMax) {
+                varMax = varBetween;
+                threshold = i;
+            }
+        }
+
+        return threshold;
+    }
+
+    private int[] imageHistogram()
+    {
+        int[] histogram = new int[256];
+
+        for (int i = 0; i < histogram.length; i++)
+            histogram[i] = 0;
+        int height,width;
+        height=getHeight();width=getWidth();
+        
+        for (int i = 1; i < height-1; i++) {
+            for (int j = 1; j < width-1; j++) {
+                histogram[iData[i][j] & 0xff]++;
+            }
+        }
+        return histogram;
+    }
+
     /* export image to a file */
     public void exportImage(String path) {
+        try {
+            File ProcessedImage = new File(path);
 
+            if(dirty) {
+                int wd = getWidth() - 1;
+                int ht = getHeight() - 1;
+                img = new BufferedImage(wd - 1, ht - 1, BufferedImage.TYPE_INT_RGB);
+                for(int i = 1; i < ht; i++) {
+                    for(int j = 1; j < wd; j++) {
+                        img.setRGB(j - 1, i - 1, iData[i][j]);
+                    }
+                }
+            }
+            ImageIO.write(img, "jpg", ProcessedImage);
+        } catch (IOException ex) {
+            Logger.getLogger(OImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /* to invert the color of the image */
@@ -68,4 +192,21 @@ class OImage extends BasicImage {
 
     }
 
+    int getLowByte(int word32, int byteno) {
+        return ((word32 >> (byteno << 3)) & 0xff);
+    }
+    
+    public void grayscale() {
+        int wd = getWidth();
+        int ht = getHeight();
+        for (int i = 1; i < ht-1; i++) {
+            for (int j = 1; j < wd-1; j++) {
+                int xIntensity = (int) (getLowByte(iData[i][j], 3) * 0.2126 +
+                                        getLowByte(iData[i][j], 2) * 0.7152 +
+                                        getLowByte(iData[i][j], 0) * 0.0722);
+                iData[i][j] = (xIntensity << 16) | (xIntensity << 8) | (xIntensity);
+            }
+        }
+    }
+    
 }
