@@ -64,7 +64,7 @@ public class mCanvas extends JPanel {
             );
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }
+            }
     }
 
     public void redraw() {
