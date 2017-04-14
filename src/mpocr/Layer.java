@@ -9,11 +9,11 @@ package mpocr;
  *
  * @author mmp
  */
-class Layer {
+public class Layer {
     
     private Neuron[] neurons;
     private String name;
-    public static final int magic = 0x783477;
+    public static final int magic = 0x138d75;
     
     Layer(int ncount, double[] weights, double[] thresholds, String name) {
         
@@ -26,6 +26,7 @@ class Layer {
         for (int i = 0; i < ncount; i++) {
             neurons[i] = new Neuron(weights[i], thresholds[i]);
         }
+        this.name = name;
     }
     
     Layer(int ncount, double weight, double threshold, String name) {
@@ -34,6 +35,7 @@ class Layer {
         for (int i = 0; i < ncount; i++) {
             neurons[i] = new Neuron(weight, threshold);
         }
+        this.name = name;
         
     }
     public Neuron getNeuron(int index) {
@@ -47,5 +49,9 @@ class Layer {
 
     public int getMagic() {
         return magic;
+    }
+
+    String getName() {
+        return name;
     }
 }

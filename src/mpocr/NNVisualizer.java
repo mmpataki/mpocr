@@ -6,6 +6,7 @@
 package mpocr;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 
@@ -29,30 +30,37 @@ public class NNVisualizer extends JPanel {
         }
     }
     
-    int width, height;
-    int node_margin = 15;
-    int padding = 10;
-    int layerheight, layerwidth, layer_margin = 3, layerpadding = 5;
+    private int width, height, padding;
+    private int node_margin;
+    private int layerheight, layerwidth, layer_margin;
+    private int fontsize;
     
-    NeuralNetwork nn;
-    int nlayers;
+    private NeuralNetwork nn;
+    private int nlayers;
     
-    Color background;
-    Color pipecolor;
-    Color layerbackground = new Color(0xf6f6f6);
+    Color background, pipecolor, layerbackground, fontcolor;
     
     public NNVisualizer() {
-        this.background = new Color(0xfafafa);
-        this.pipecolor = new Color(0x000000);
-        this.nlayers = 0;
+        initDefs();
     }
     
     public NNVisualizer(NeuralNetwork nn) {
-        this.background = new Color(0xfafafa);
-        this.pipecolor = new Color(0x000000);
-        this.nlayers = 0;
+        initDefs();
         this.nn = nn;
     }
+    
+    private void initDefs() {
+        this.fontcolor= new Color(0x000);
+        this.layerbackground = new Color(0xf6f6f6);
+        this.background = new Color(0xfafafa);
+        this.pipecolor = new Color(0x000000);
+        
+        this.fontsize = 16;
+        this.layer_margin = 3;
+        this.node_margin = 15;
+        this.padding = 10;
+    }
+    
     
     public void setNN(NeuralNetwork nn) {
         this.nn = nn;
@@ -73,7 +81,6 @@ public class NNVisualizer extends JPanel {
         g.setColor(background);
         g.fillRect(0, 0, width, height);
         
-        g.setColor(layerbackground);
         for (int i = 0; i < nlayers; i++) {
             
             ldi[i] = new LayerDrawingInfo();
@@ -90,9 +97,16 @@ public class NNVisualizer extends JPanel {
                         ) / 2,
                         3
                     );
-            ldi[i].yoff = (layerheight - ((node_margin + ldi[i].radius) * 2)) / 2;
+            ldi[i].yoff = (layerheight - ((node_margin + ldi[i].radius) * 2)) / 2 + fontsize / 2;
+            
+            g.setColor(layerbackground);
             g.fillRect(ldi[i].x, ldi[i].y, layerwidth, layerheight);
+            g.setFont(new Font("Consolas", Font.BOLD, fontsize - 2));
+            g.setColor(fontcolor);
+            g.drawString(l.getName(), ldi[i].x, ldi[i].y + fontsize);
+
             ldi[i].fx = ldi[i].x = (layerwidth - (2 * ldi[i].nc * (ldi[i].radius + node_margin))) / 2 + node_margin;
+            
         }
         
         for (int i = 0; i < nlayers; i++) {

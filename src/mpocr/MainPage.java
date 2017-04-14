@@ -9,12 +9,13 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class MainPage extends javax.swing.JFrame {
 
     public MainPage() {
+        
         initComponents();
         canvas.zoomIn(1);
         
         ClassifierNetwork cn = new ClassifierNetwork();
-        for (int i = 0; i < 4; i++) {
-            Layer l = new Layer(10+(int)(Math.pow(-1, i) * i), 2.3, 1.5, ("Sample Layer " + i));
+        for (int i = 1; i < 5; i++) {
+            Layer l = new Layer(10+(int)(Math.pow(-1, i) * i), 2.3, 1.5, ("Layer " + i));
             cn.addLayer(l);
         }
         nnv.setNN(cn);
@@ -81,7 +82,7 @@ public class MainPage extends javax.swing.JFrame {
         );
         canvasLayout.setVerticalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 272, Short.MAX_VALUE)
+            .addGap(0, 339, Short.MAX_VALUE)
         );
 
         jScrollPane2.setViewportView(canvas);
@@ -132,7 +133,7 @@ public class MainPage extends javax.swing.JFrame {
         );
         nnvLayout.setVerticalGroup(
             nnvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 296, Short.MAX_VALUE)
+            .addGap(0, 340, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -195,7 +196,7 @@ public class MainPage extends javax.swing.JFrame {
                             .addComponent(histogram)
                             .addComponent(Segment))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(nnv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
