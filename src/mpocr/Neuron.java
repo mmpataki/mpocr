@@ -11,19 +11,38 @@ package mpocr;
  */
 class Neuron {
     
-    private double weight;
-    private double threshold;
+    private double bias, oldbias;
+    private double error;
+    private double activation;
+    private double winput;
     
-    Neuron(double xweight, double xthreshold) {
-        weight = xweight;
-        threshold = xthreshold;
+    ActivationFunction afunc;
+    
+    Neuron(double bias, ActivationFunction afunc) {
+        this.bias = bias;
+        this.afunc = afunc;
     }
     
-    public double getWeight() {
-        return weight;
-    }
-    public double getThreshold() {
-        return threshold;
+    /* calculates the activation of this neuron. */
+    public double process(double pWeights[], double pActivations[]) {
+        winput = 0.0;
+        for (int i = 0; i < Util.minlen(pWeights, pActivations); i++) {
+            winput += pWeights[i] * pActivations[i];
+        }
+        activation = afunc.fire(winput + bias);
+        return activation;
     }
     
+    public double getWinput() {
+        return winput;
+    }
+    public double getActivation() {
+        return activation;
+    }
+    public double getBias() {
+        return bias;
+    }
+    public double getOldBias() {
+        return oldbias;
+    }
 }

@@ -11,33 +11,36 @@ package mpocr;
  */
 public class Layer {
     
-    private Neuron[] neurons;
-    private String name;
     public static final int magic = 0x138d75;
     
-    Layer(int ncount, double[] weights, double[] thresholds, String name) {
+    private Neuron[] neurons;
+    private double[][] weights;
+    private double[][] tweights;
+    private double[][] oldWeights;
+    
+    
+    /*
+     * ncount: number of neurons in this layer.
+     * nncount: number of neurons in next layer.
+     */
+    Layer(int ncount, int nncount, double[][] weights, double[] biases, ActivationFunction afunc) throws Exception {
         
-        if(ncount != weights.length || ncount != thresholds.length) {
-            Util.puts("The number of weights didn't match");
-            return;
+        if(
+            ncount == 0 || nncount == 0 ||
+            ncount != weights.length ||
+            ncount != biases.length ||
+            weights.length == 0 ||
+            weights[0].length != nncount) {
+            throw new Exception("The number of weights didn't match");
         }
         
         neurons = new Neuron[ncount];
+        this.weights = weights;
         for (int i = 0; i < ncount; i++) {
-            neurons[i] = new Neuron(weights[i], thresholds[i]);
+            neurons[i] = new Neuron(biases[i], afunc);
         }
-        this.name = name;
     }
     
-    Layer(int ncount, double weight, double threshold, String name) {
-        
-        neurons = new Neuron[ncount];
-        for (int i = 0; i < ncount; i++) {
-            neurons[i] = new Neuron(weight, threshold);
-        }
-        this.name = name;
-        
-    }
     public Neuron getNeuron(int index) {
         if(index < 0 || index >= neurons.length)
             return null;
@@ -51,7 +54,4 @@ public class Layer {
         return magic;
     }
 
-    String getName() {
-        return name;
-    }
 }

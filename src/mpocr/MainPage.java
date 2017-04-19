@@ -1,6 +1,8 @@
 package mpocr;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -13,12 +15,13 @@ public class MainPage extends javax.swing.JFrame {
         initComponents();
         canvas.zoomIn(1);
         
-        ClassifierNetwork cn = new ClassifierNetwork();
+        NeuralNetwork cn = new NeuralNetwork();
         for (int i = 1; i < 5; i++) {
-            Layer l = new Layer(10+(int)(Math.pow(-1, i) * i), 2.3, 1.5, ("Layer " + i));
-            cn.addLayer(l);
+            //Layer l = new Layer(10+(int)(Math.pow(-1, i) * i), 2.3, 1.5, ("Layer " + i));
+            //cn.addLayer(l);
         }
         nnv.setNN(cn);
+        (new Matrix(1,1)).test();
     }
 
     /**

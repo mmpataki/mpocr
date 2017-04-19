@@ -48,4 +48,12 @@ class Util {
         }
         return (((double)fgs / (double)(down-up)) <= excuse);
     }
+    
+    static int minlen(Object[] a, Object[] b) {
+        return a.length<b.length?a.length:b.length;
+    }
+
+    static int minlen(double[] a, double[] b) {
+        return a.length<b.length?a.length:b.length;
+    }
 }

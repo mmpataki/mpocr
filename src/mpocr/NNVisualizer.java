@@ -103,7 +103,7 @@ public class NNVisualizer extends JPanel {
             g.fillRect(ldi[i].x, ldi[i].y, layerwidth, layerheight);
             g.setFont(new Font("Consolas", Font.BOLD, fontsize - 2));
             g.setColor(fontcolor);
-            g.drawString(l.getName(), ldi[i].x, ldi[i].y + fontsize);
+            g.drawString(("Layer " + (i+1)), ldi[i].x, ldi[i].y + fontsize);
 
             ldi[i].fx = ldi[i].x = (layerwidth - (2 * ldi[i].nc * (ldi[i].radius + node_margin))) / 2 + node_margin;
             
