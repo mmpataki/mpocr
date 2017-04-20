@@ -123,6 +123,9 @@ public class NNVisualizer extends JPanel {
         }
         
         nlayers = nn.layersCount();
+        if(nlayers == 0) {
+            return;
+        }
         layerheight = (height - (padding * 2) - (layer_margin * (nlayers + 1))) / nlayers;
         layerwidth = width - (padding * 2) - (layer_margin * 2);
     }

@@ -15,21 +15,31 @@ class Neuron {
     private double error;
     private double activation;
     private double winput;
+    private int index;
     
     ActivationFunction afunc;
     
-    Neuron(double bias, ActivationFunction afunc) {
-        this.bias = bias;
+    Neuron(Double bias, ActivationFunction afunc, int index) {
+        if(bias == null) {
+            randomize();
+        } else {
+            this.bias = bias;
+        }
         this.afunc = afunc;
+        this.index = index;
     }
     
     /* calculates the activation of this neuron. */
     public double process(double pWeights[], double pActivations[]) {
-        winput = 0.0;
-        for (int i = 0; i < Util.minlen(pWeights, pActivations); i++) {
-            winput += pWeights[i] * pActivations[i];
+        if(pWeights == null) {
+            activation = winput = pActivations[index];
+        } else {
+            winput = 0.0;
+            for (int i = 0; i < Util.minlen(pWeights, pActivations); i++) {
+                winput += pWeights[i] * pActivations[i];
+            }
+            activation = afunc.fire(winput + bias);
         }
-        activation = afunc.fire(winput + bias);
         return activation;
     }
     
@@ -44,5 +54,8 @@ class Neuron {
     }
     public double getOldBias() {
         return oldbias;
+    }
+    public final void randomize() {
+        this.bias = Math.random();
     }
 }

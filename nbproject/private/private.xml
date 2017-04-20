@@ -5,11 +5,14 @@
         <group>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MainPage.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Neuron.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/INeuralNetwork.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/NNVisualizer.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Segment.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Zones.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/mCanvas.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/ClassifierNetwork.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Features.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/IFeatureSet.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/FeatureSet.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Layer.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Matrix.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/NeuralNetwork.java</file>
         </group>
     </open-files>

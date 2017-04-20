@@ -12,7 +12,7 @@ package mpocr;
 public class Zones extends FeatureSet {
 
     public static final int magic = 0x0001;
-    public double zones[];
+    private double zones[];
     
     /**
      * The idea is to divide the image into 9 equal parts and store the
@@ -81,4 +81,8 @@ public class Zones extends FeatureSet {
         Util.puts("\n");
     }
     
+    @Override
+    public double[] getFeatures() {
+        return zones;
+    }
 }

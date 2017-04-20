@@ -37,6 +37,9 @@ public class Matrix {
         matrix = new double[rows][cols];
         copy(matrix, x.matrix);
     }
+    /**
+     * Transposes the matrix itself.
+     */
     public void transpose() throws Exception {
         double[][] dest = matrix;
         if(rows != cols) {
@@ -46,24 +49,26 @@ public class Matrix {
         transpose(dest, matrix);
         matrix = dest;
     }
+    /**
+     * @param matrix: the matrix to be transposed
+     * @return returns the transpose of the supplied matrix
+     * @throws Exception 
+     */
     public static double[][] transpose(double[][] matrix) throws Exception {
         if(matrix.length == 0 || matrix[0].length == 0) {
             throw new Exception("Null matrix supplied for transpose");
         }
-        double[][] dest = matrix;
-        if(matrix.length != matrix[0].length) {
-            dest = new double[matrix[0].length][matrix.length];
-            copy(dest, matrix);
-        }
+        double[][] dest = new double[matrix[0].length][matrix.length];
+        copy(dest, matrix);
         transpose(dest, matrix);
         return dest;
     }
     private static void transpose(double[][] dest, double[][] matrix) throws Exception {
         
         if(matrix.length == 0 || matrix[0].length == 0 ||
-                dest.length != matrix[0].length ||
-                dest[0].length != matrix.length) {
-            throw new Exception("Null matrix supplied for transpose");
+                dest.length < matrix[0].length ||
+                dest[0].length < matrix.length) {
+            throw new Exception("Null/Incompatible-dest matrix supplied for transpose");
         }
         int rows = matrix.length;
         int cols = matrix[0].length;
@@ -87,11 +92,11 @@ public class Matrix {
                 a.length == 0 || b.length == 0 || dest.length == 0) {
             throw new NullPointerException("Matrices are null");
         }
-        if(
-                a.length != b[0].length ||
-                dest.length != a.length ||
-                dest[0].length != b[0].length) {
+        if(a[0].length != b.length) {
             throw new Exception("matrices are multiplication incompatible");
+        }
+        if(dest.length < a.length || dest[0].length < b[0].length) {
+            throw new Exception("Output matrix size is small");
         }
         int m = a.length, n = a[0].length, p = b[0].length;
         for (int i = 0; i < m; i++) {
@@ -106,9 +111,9 @@ public class Matrix {
     }
     
     public void test() {
-        double[][] a= {{1,1,1},{1,1,1},{1,1,1}};
-        double[][] b= {{1,1,1},{1,1,1},{1,1,1}};
-        double[][] c= new double[3][3];
+        double[][] a= {{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}};
+        double[][] b= {{1,1,1},{1,1,1},{1,1,1},{1,1,1}};
+        double[][] c= new double[4][3];
         try {
             System.out.println("Testing multiplication");
             Matrix.multiply(c, a, b);

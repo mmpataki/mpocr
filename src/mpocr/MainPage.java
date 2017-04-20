@@ -10,18 +10,21 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class MainPage extends javax.swing.JFrame {
 
+    NeuralNetwork cn;
+    
     public MainPage() {
         
         initComponents();
         canvas.zoomIn(1);
         
-        NeuralNetwork cn = new NeuralNetwork();
-        for (int i = 1; i < 5; i++) {
-            //Layer l = new Layer(10+(int)(Math.pow(-1, i) * i), 2.3, 1.5, ("Layer " + i));
-            //cn.addLayer(l);
+        int[] nnnc = {9,5,8,2,6};
+        cn = null;
+        try {
+            cn = new NeuralNetwork(nnnc, null, null, new SigmoidFunction());
+        } catch (Exception ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
         nnv.setNN(cn);
-        (new Matrix(1,1)).test();
     }
 
     /**
@@ -277,6 +280,11 @@ public class MainPage extends javax.swing.JFrame {
             seg.printimage();
             seg.segmentImage();
             seg.features.get(Zones.magic).printFeatures();
+            cn.propagate((seg.features.get(Zones.magic)).getFeatures());
+            double[] ops = cn.getOutput();
+            for (double op : ops) {
+                Util.puts(op + ", ");
+            }
         }
     }//GEN-LAST:event_SegmentActionPerformed
 

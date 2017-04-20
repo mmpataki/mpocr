@@ -19,5 +19,7 @@ public interface IFeatureSet {
     
     /* to print features */
     public void printFeatures();
-    
+
+    /* to get features */
+    public double[] getFeatures();
 }

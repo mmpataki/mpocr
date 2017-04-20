@@ -8,5 +8,5 @@ package mpocr;
  * extend FeatureSet (this) class.
  */
 public abstract class FeatureSet implements IFeatureSet {
-    
+
 }
