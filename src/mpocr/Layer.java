@@ -5,6 +5,8 @@
  */
 package mpocr;
 
+import java.util.Arrays;
+
 /**
  *
  * @author mmp
@@ -23,7 +25,7 @@ public class Layer {
     private Neuron[] neurons;
     private double[][] weights;
     private double[][] oldWeights;
-    
+    private int index;
     /**
      * .
      * ncount: number of neurons in this layer.
@@ -33,7 +35,7 @@ public class Layer {
      *      neuron in a row. if provided null the layer will randomize it
      */
     Layer(int ncount, int nncount, double[][] weights,
-            double[] biases, ActivationFunction afunc) throws Exception {
+            double[] biases, ActivationFunction afunc, int index) throws Exception {
         
         if(
             ncount == 0 || nncount == 0 ||
@@ -63,6 +65,7 @@ public class Layer {
             this.weights = new double[nncount][ncount];
             randomize((biases == null));
         }
+        this.index = index;
     }
     
     public final void randomize(boolean neuron) {
@@ -86,9 +89,32 @@ public class Layer {
      * @param pActivations 
      */
     public void process(double[][] pWeights, double[] pActivations) {
-        for (int i = 0; i < neurons.length; i++) {
+        for (int i = 0; i < neurons.length; i++) { 
             neurons[i].process(pWeights == null ? null : pWeights[i], pActivations);
         }
+        Util.puts("activations(" + index + ") : [");
+        for (double x : getActivations()) {
+            Util.puts(x + ", ");
+        }
+        Util.puts("]\n");
+    }
+    
+    public void computeErrors(double[] errors) throws Exception {
+        
+        double[][] twts = Matrix.transpose(weights);
+        double[][] terr = Matrix.transpose(new double[][]{errors});
+        double[][] err  = new double[twts.length][1];
+        double[]   acts = new double[neuronCount()];
+        
+        Matrix.multiply(err, twts, terr);
+        
+        Util.puts("errors [");
+        for(int i = 0; i<neuronCount(); i++) {
+            err[i][0] *= neurons[i].getDiffActivation();
+            neurons[i].setError(err[i][0]);
+            Util.puts(err[i][0] + ", ");
+        }
+        Util.puts("]\n");
     }
     
     public Neuron getNeuron(int index) {
@@ -117,4 +143,34 @@ public class Layer {
         }
         return ops;
     }
+
+    public double[] getErrors() {
+        double[] errors = new double[neuronCount()];
+        for (int i = 0; i < errors.length; i++) {
+            errors[i] = neurons[i].getError();
+        }
+        return errors;
+    }
+    
+    public void correctErrors(double[] activations, double[][] pWeights, double eta, int index) {
+        for (int i = 0; i < neuronCount(); i++) {
+            neurons[i].setBias(neurons[i].getBias() - (eta * neurons[i].getError()));
+        }
+        if(pWeights == null)
+            return;
+        for (int i = 0; i < pWeights.length; i++) {
+            for (int j = 0; j < pWeights[0].length; j++) {
+                pWeights[i][j] -= (eta * (activations[j] * neurons[i].getError()));
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        String toret = "\tlayer[" + index + "] : {\n";
+        toret += "\t\tweights : " + Arrays.deepToString(weights) + "\n";
+        toret += "\t\tneurons : " + Arrays.deepToString(neurons) + "\n";
+        return toret + "\t}";
+    }
+    
 }

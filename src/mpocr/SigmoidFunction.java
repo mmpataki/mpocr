@@ -19,5 +19,14 @@ public class SigmoidFunction extends ActivationFunction {
     public double fire(double z) {
         return (1.0 / (1 + Math.exp(-z)));
     }
+
+    @Override
+    public double derivative(double z) {
+        double x = fire(z);
+        return x * (1 - x);
+        //double x = Math.exp(-z);
+        //double d = 1 + x;
+        //return (x / (d * d));
+    }
     
 }

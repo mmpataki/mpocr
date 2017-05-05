@@ -72,15 +72,12 @@ class OImage extends BasicImage {
         int threshold = Threshold();
         int ht = getHeight();
         int wd = getWidth();
-        exportImage("gray.jpg");
         for (int i = 0; i < ht; i++) {
             for (int j = 0; j < wd; j++) {
                 iData[i][j] = (iData[i][j] < threshold) ? getBackground() : getForeground();
             }
         }
         binarized = true;
-        Util.puts(threshold + "");
-        exportImage("binarized.jpg");
     }
 
     private int Threshold() {
@@ -161,7 +158,13 @@ class OImage extends BasicImage {
 
     /* to invert the color of the image */
     public void invertScale() {
-
+        int fg = getForeground();
+        int bg = getBackground();
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
+                iData[i][j] = iData[i][j] == fg ? bg : fg;
+            }
+        }
     }
 
     int getLowByte(int word32, int byteno) {

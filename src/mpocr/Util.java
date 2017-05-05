@@ -18,6 +18,10 @@ class Util {
     public static void puts(String toput) {
         System.out.print(toput);
     }
+    //forced output twiddle a character and force it off.
+    public static void putsf(String toput) {
+        System.out.print(toput);
+    }
     
     /*
      * this checks whether a row(line) given contains any foreground pixels
@@ -39,6 +43,8 @@ class Util {
      * having foreground pixel count 
     */
     static boolean isemptyCol(int[][] idata, int up, int down, int col, int fg, double excuse) {
+        if(up < 0 || down < 0)
+            return false;
         int fgs = 0;
         excuse /= 100.0;
         for (int i = up; i < down; i++) {

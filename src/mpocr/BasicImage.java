@@ -59,6 +59,16 @@ class BasicImage implements IImage {
         Util.puts("\n");
     }
     
+    public void printimageforce() {
+        for (int[] row : iData) {
+            System.out.print("\n");
+            for (int j = 0; j < iData[0].length; j++) {
+                System.out.print(row[j] == getBackground() ? "." : "#");
+            }
+        }
+        System.out.print("\n");
+    }
+    
     private static final int NREVERSE = 0;
     private static final int REVERSE = 1;
 
@@ -99,7 +109,7 @@ class BasicImage implements IImage {
         int xc = getXIntersection(iData, NREVERSE);
         int yc = getYIntersection(iData, NREVERSE);
 
-        System.out.println(xc + ", " + yc + " " + iData.length);
+        Util.puts(xc + ", " + yc + " " + iData.length);
 
         for (int i = 1, ic = yc; ic < iData.length; i++, ic++) {
             for (int j = 10, jc = xc; jc < iData[0].length; j++, jc++) {

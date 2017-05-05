@@ -1,6 +1,7 @@
 package mpocr;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -11,16 +12,28 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class MainPage extends javax.swing.JFrame {
 
     NeuralNetwork cn;
+    Trainer trainer;
     
     public MainPage() {
         
         initComponents();
         canvas.zoomIn(1);
         
-        int[] nnnc = {9,5,8,2,6};
+        double[][][] wts = {
+            {{1,1},{1,1}}
+        };
+        double[][] biases = {
+            {1,1,1},
+            {1,1,1}
+        };
+        
+        int[] nnnc = {2,2};
+        //int[] nnnc = {9,50,90,128};
         cn = null;
         try {
-            cn = new NeuralNetwork(nnnc, null, null, new SigmoidFunction());
+            cn = new NeuralNetwork(nnnc, wts, biases, new SigmoidFunction(), 1);
+            //cn = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.02);
+            trainer = new Trainer(cn, "/home/mmp/Desktop/foo/", "charcterindex.txt", "", "");
         } catch (Exception ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,13 +57,10 @@ public class MainPage extends javax.swing.JFrame {
         ZoomOut = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         canvas = new mpocr.mCanvas();
-        Thin = new javax.swing.JButton();
-        Cover = new javax.swing.JButton();
         hack = new javax.swing.JCheckBox();
-        CSkew = new javax.swing.JButton();
-        histogram = new javax.swing.JButton();
-        Segment = new javax.swing.JButton();
+        Train = new javax.swing.JButton();
         nnv = new mpocr.NNVisualizer();
+        ExtractTextButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,50 +94,22 @@ public class MainPage extends javax.swing.JFrame {
         canvas.setLayout(canvasLayout);
         canvasLayout.setHorizontalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 443, Short.MAX_VALUE)
+            .addGap(0, 1160, Short.MAX_VALUE)
         );
         canvasLayout.setVerticalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 339, Short.MAX_VALUE)
+            .addGap(0, 382, Short.MAX_VALUE)
         );
 
         jScrollPane2.setViewportView(canvas);
 
-        Thin.setText("Thin");
-        Thin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ThinActionPerformed(evt);
-            }
-        });
-
-        Cover.setText("Cover");
-        Cover.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CoverActionPerformed(evt);
-            }
-        });
-
         hack.setSelected(true);
         hack.setText("Use Hack");
 
-        CSkew.setText("CSkew");
-        CSkew.addActionListener(new java.awt.event.ActionListener() {
+        Train.setText("Train");
+        Train.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CSkewActionPerformed(evt);
-            }
-        });
-
-        histogram.setText("Histogram");
-        histogram.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                histogramActionPerformed(evt);
-            }
-        });
-
-        Segment.setText("Segment");
-        Segment.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SegmentActionPerformed(evt);
+                TrainActionPerformed(evt);
             }
         });
 
@@ -135,44 +117,48 @@ public class MainPage extends javax.swing.JFrame {
         nnv.setLayout(nnvLayout);
         nnvLayout.setHorizontalGroup(
             nnvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 525, Short.MAX_VALUE)
         );
         nnvLayout.setVerticalGroup(
             nnvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 340, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
+
+        ExtractTextButton.setText("Extract Text");
+        ExtractTextButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ExtractTextButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(nnv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(hack)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nnv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Train))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ImportButton))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(hack)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ImportButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ExtractTextButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 330, Short.MAX_VALUE)
+                                .addComponent(ZoomOut)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ZoomIn))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(Cover)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(Thin)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CSkew)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(histogram)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(Segment)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(ZoomOut)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ZoomIn))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(ImagePath)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(ImagePath))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -180,31 +166,21 @@ public class MainPage extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(ImportButton)
-                        .addComponent(hack))
-                    .addComponent(jLabel1))
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ImagePath)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(ZoomIn)
-                            .addComponent(ZoomOut)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Cover)
-                            .addComponent(Thin)
-                            .addComponent(CSkew)
-                            .addComponent(histogram)
-                            .addComponent(Segment))))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ZoomIn)
+                    .addComponent(ZoomOut)
+                    .addComponent(Train)
+                    .addComponent(ExtractTextButton)
+                    .addComponent(hack)
+                    .addComponent(ImportButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(nnv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(nnv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -222,14 +198,6 @@ public class MainPage extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void CoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CoverActionPerformed
-        canvas.cover();
-    }//GEN-LAST:event_CoverActionPerformed
-
-    private void ThinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ThinActionPerformed
-        canvas.thin();
-    }//GEN-LAST:event_ThinActionPerformed
-
     private void ZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ZoomOutActionPerformed
         canvas.zoomOut(1);
     }//GEN-LAST:event_ZoomOutActionPerformed
@@ -240,9 +208,9 @@ public class MainPage extends javax.swing.JFrame {
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
         
-        String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
+        String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed.jpeg"; //full noisy, small font
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed1.png";   //less noisy
         
@@ -265,28 +233,31 @@ public class MainPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ImportButtonActionPerformed
 
-    private void CSkewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CSkewActionPerformed
-        OCRCore.cskew(canvas);
-    }//GEN-LAST:event_CSkewActionPerformed
+    private void TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TrainActionPerformed
+        /**
+        try {
+            trainer.train();
+        } catch (Exception ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /**/
+        FaltuTrainer ft = new FaltuTrainer(cn);
+        try {
+            ft.train();
+        } catch (Exception ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /**/
+    }//GEN-LAST:event_TrainActionPerformed
 
-    private void histogramActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramActionPerformed
-        OCRCore.getHist(canvas.iData);
-    }//GEN-LAST:event_histogramActionPerformed
-
-    private void SegmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SegmentActionPerformed
-        canvas.binarize();
-        Segment[] segs = Segmentation.segmentImage(canvas.oimg);
-        for (Segment seg: segs) {
-            seg.printimage();
-            seg.segmentImage();
-            seg.features.get(Zones.magic).printFeatures();
-            cn.propagate((seg.features.get(Zones.magic)).getFeatures());
-            double[] ops = cn.getOutput();
-            for (double op : ops) {
-                Util.puts(op + ", ");
+    private void ExtractTextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExtractTextButtonActionPerformed
+        if(canvas.oimg != null) {
+            ArrayList<Character> chars = (new TextRecognizer(cn, canvas.oimg)).extract();
+            for (Character aChar : chars) {
+                System.out.print(aChar);// + " [" + ((int)aChar) + "]\n");
             }
         }
-    }//GEN-LAST:event_SegmentActionPerformed
+    }//GEN-LAST:event_ExtractTextButtonActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -302,17 +273,14 @@ public class MainPage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton CSkew;
-    private javax.swing.JButton Cover;
+    private javax.swing.JButton ExtractTextButton;
     private javax.swing.JLabel ImagePath;
     private javax.swing.JButton ImportButton;
-    private javax.swing.JButton Segment;
-    private javax.swing.JButton Thin;
+    private javax.swing.JButton Train;
     private javax.swing.JButton ZoomIn;
     private javax.swing.JButton ZoomOut;
     private mpocr.mCanvas canvas;
     private javax.swing.JCheckBox hack;
-    private javax.swing.JButton histogram;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

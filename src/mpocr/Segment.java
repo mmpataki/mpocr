@@ -19,8 +19,14 @@ class Segment extends BasicImage {
         super.printimage();
         for (int i = 0; i < getWidth(); i++)Util.puts("-"); Util.puts("\n");
     }
+    
+    public void printImageForce() {
+        for (int i = 0; i < getWidth(); i++)Util.puts("-"); System.out.print("\n");
+        super.printimageforce();
+        for (int i = 0; i < getWidth(); i++)Util.puts("-"); System.out.print("\n");
+    }
 
-    void segmentImage() {
+    void extractFeatures() {
         features.add(new Zones(this));
     }
 }

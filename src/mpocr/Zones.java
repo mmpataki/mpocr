@@ -42,8 +42,6 @@ public class Zones extends FeatureSet {
         ht = bottom - top + 1;
         wd = right - left + 1;
         
-        Util.puts("left : " + left + ", right : " + right + ", top : " + top + ", bottom: " + bottom + "\n");
-        
         int wf = (int)Math.ceil((double)wd / 3);
         int hf = (int)Math.ceil((double)ht / 3);
         int ppz = wf * hf;
@@ -75,10 +73,11 @@ public class Zones extends FeatureSet {
 
     @Override
     public void printFeatures() {
+        Util.puts("Input vector : [");
         for (double zone : zones) {
             Util.puts(zone + ", ");
         }
-        Util.puts("\n");
+        Util.puts("] \n");
     }
     
     @Override

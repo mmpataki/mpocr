@@ -8,6 +8,7 @@ package mpocr;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import static java.lang.Integer.max;
 import javax.swing.JPanel;
 
 /**
@@ -37,6 +38,7 @@ public class NNVisualizer extends JPanel {
     
     private NeuralNetwork nn;
     private int nlayers;
+    private boolean drawlinks = true;
     
     Color background, pipecolor, layerbackground, fontcolor;
     
@@ -57,8 +59,8 @@ public class NNVisualizer extends JPanel {
         
         this.fontsize = 16;
         this.layer_margin = 3;
-        this.node_margin = 15;
-        this.padding = 10;
+        this.node_margin = 5;
+        this.padding = 5;
     }
     
     
@@ -106,7 +108,8 @@ public class NNVisualizer extends JPanel {
             g.drawString(("Layer " + (i+1)), ldi[i].x, ldi[i].y + fontsize);
 
             ldi[i].fx = ldi[i].x = (layerwidth - (2 * ldi[i].nc * (ldi[i].radius + node_margin))) / 2 + node_margin;
-            
+            if(drawlinks && ldi[i].nc > maxconns) 
+                drawlinks = false;
         }
         
         for (int i = 0; i < nlayers; i++) {
@@ -130,6 +133,7 @@ public class NNVisualizer extends JPanel {
         layerwidth = width - (padding * 2) - (layer_margin * 2);
     }
 
+    int maxconns = 10;
     private void drawLayer(Graphics g, LayerDrawingInfo l1, LayerDrawingInfo l2) {
 
         l1.y += node_margin;
@@ -138,16 +142,17 @@ public class NNVisualizer extends JPanel {
             
             g.setColor(pipecolor);
             
-            if(l2 != null) {
+            if(l2 != null && drawlinks) {
                 
                 l2.y += node_margin;
+                int quant = max((l2.nc / maxconns), 1);
                 
-                for (int k = 0; k < l2.nc; k++) {
+                for (int k = 0; k < l2.nc; k += quant) {
                     g.drawLine(
                             l1.x + l1.radius, l1.y + l1.yoff + l1.radius,
                             l2.x + l2.radius, l2.y + l2.yoff + l2.radius
                     );
-                    l2.x += (l2.radius + node_margin) * 2;
+                    l2.x += quant * (l2.radius + node_margin) * 2;
                 }
                 l2.reset();
             }

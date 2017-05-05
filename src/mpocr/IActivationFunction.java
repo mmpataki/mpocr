@@ -11,4 +11,5 @@ package mpocr;
  */
 interface IActivationFunction {
     public double fire(double z);
+    public double derivative(double z);
 }
