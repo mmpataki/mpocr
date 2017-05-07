@@ -28,5 +28,6 @@ class Segment extends BasicImage {
 
     void extractFeatures() {
         features.add(new Zones(this));
+        features.add(new PixelBuffer(this));
     }
 }

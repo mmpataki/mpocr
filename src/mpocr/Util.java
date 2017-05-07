@@ -16,7 +16,7 @@ class Util {
      * to suppress just comment the method's body.
      */
     public static void puts(String toput) {
-        System.out.print(toput);
+        //System.out.print(toput);
     }
     //forced output twiddle a character and force it off.
     public static void putsf(String toput) {

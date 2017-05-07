@@ -5,6 +5,8 @@
  */
 package mpocr;
 
+import java.util.Arrays;
+
 /**
  *
  * @author mmp
@@ -22,13 +24,13 @@ public class FaltuTrainer {
         double[] op = new double[2];
         double[] ip = new double[2];
         int counter = 0;
-        int tsize = 10;
+        int tsize = 4;
         int notice = (tsize / 100)|1;
         for (int i = 0; i < tsize; i++) {
             
-            int ib = (i%4);//(int) ((Math.random()* 10000000) % 2);
-            int ia = (i%4)>>1;//(int) ((Math.random() * 10000000) % 2);
-            int eop= (((ia != 0) || (ib != 0)) ? 1 : 0);
+            int ib = /**/i & 1;          /** (int) ((Math.random()* 10000000) % 2);  /**/
+            int ia = /**/((i & 2) >> 1); /** (int) ((Math.random() * 10000000) % 2); /**/
+            int eop= ia | ib;
             ip[0] = ia;
             ip[1] = ib;
             
@@ -37,16 +39,17 @@ public class FaltuTrainer {
             Util.putsf("\ninput [ " + ia + ", " + ib + "]\n");
             
             for (int j = 0; j < op.length; j++) op[j] = 0;
-            op[eop] = 1;
+            op[0] = eop;
             
             network.propagate(ip, op);
             
             double[] aop = network.getOutput();
             
-            int lop = ((aop[0]>aop[1])?0:1);
+            int lop = (aop[0] < 0.5 ? 0 : 1);
             
-            Util.putsf("\noutput : [" + aop[0] + ", " + aop[1] + "]");
+            Util.putsf("\noutput : " + Arrays.toString(aop));
             Util.putsf("\noutput : [" + lop + "]\n");
+            Util.putsf("expected : [" + eop + "]\n");
             
             if(lop == eop) {
                 counter++;
@@ -63,3 +66,4 @@ public class FaltuTrainer {
         System.out.println("Accuracy         : " + ((counter*100.0)/(double)tsize) + "%");
     }
 }
+

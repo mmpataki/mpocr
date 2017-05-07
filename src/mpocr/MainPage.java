@@ -20,20 +20,21 @@ public class MainPage extends javax.swing.JFrame {
         canvas.zoomIn(1);
         
         double[][][] wts = {
-            {{1,1},{1,1}}
+            {{1,1}}
         };
         double[][] biases = {
-            {1,1,1},
-            {1,1,1}
+            {1,1},
+            {1,1}
         };
         
-        int[] nnnc = {2,2};
-        //int[] nnnc = {9,50,90,128};
+        //int[] nnnc = {2, 1};
+        int[] nnnc = {784, 30, 10};  // mnist database
+        //int[] nnnc = {9,50,90,128};  // my mpocr
         cn = null;
         try {
-            cn = new NeuralNetwork(nnnc, wts, biases, new SigmoidFunction(), 1);
-            //cn = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.02);
-            trainer = new Trainer(cn, "/home/mmp/Desktop/foo/", "charcterindex.txt", "", "");
+            //cn = new NeuralNetwork(nnnc, wts, biases, new SigmoidFunction(), 1);
+            cn = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 5);
+            //trainer = new Trainer(cn, "/home/mmp/Desktop/foo/", "charcterindex.txt", "", "");
         } catch (Exception ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -240,7 +241,7 @@ public class MainPage extends javax.swing.JFrame {
         } catch (Exception ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /**/
+        /**
         FaltuTrainer ft = new FaltuTrainer(cn);
         try {
             ft.train();
@@ -248,9 +249,33 @@ public class MainPage extends javax.swing.JFrame {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
         /**/
+        try {
+            
+            MNistTrainer mt = new MNistTrainer(cn, "/home/mmp/train-images.idx3-ubyte", "/home/mmp/train-labels.idx1-ubyte", 100);
+            MNistTrainer mtst = new MNistTrainer(cn, "/home/mmp/t10k-images.idx3-ubyte", "/home/mmp/t10k-labels.idx1-ubyte", 100);
+            
+            mt.train();
+            mtst.test();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /**/
     }//GEN-LAST:event_TrainActionPerformed
 
+    int ip = 0;
     private void ExtractTextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExtractTextButtonActionPerformed
+
+        int a = ip & 1;
+        int b = (ip & 2) >> 1;
+        ip++;
+        double[] ips = new double[2];
+        ips[0]=a; ips[1]=b;
+        cn.fpropagate(ips);
+        double[] op = cn.getOutput();
+        System.out.println("ip " + a + ", " + b);
+        System.out.println(op[0]>op[1]?0:1);
+
         if(canvas.oimg != null) {
             ArrayList<Character> chars = (new TextRecognizer(cn, canvas.oimg)).extract();
             for (Character aChar : chars) {

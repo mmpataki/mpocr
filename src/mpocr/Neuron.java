@@ -32,7 +32,8 @@ class Neuron {
     /* calculates the activation of this neuron. */
     public double process(double pWeights[], double pActivations[]) {
         if(pWeights == null) {
-            winput = pActivations[index];
+            try {
+            winput = pActivations[index];}catch(Exception s){System.out.println(index + "here with size : " + pActivations.length);}
         } else {
             winput = 0.0;
             for (int i = 0; i < Util.minlen(pWeights, pActivations); i++) {
@@ -56,7 +57,7 @@ class Neuron {
         return oldbias;
     }
     public final void randomize() {
-        this.bias = Math.random();
+        this.bias = Math.pow(-1, (int)(Math.random()*100)) * Math.random();
     }
     public double getError() {
         return error;
@@ -65,7 +66,7 @@ class Neuron {
         this.error = error;
     }
     public double getDiffActivation() {
-        return afunc.derivative(activation);
+        return afunc.derivative(getWeightedInput());
     }
     public double getWeightedInput() {
         return winput + bias;

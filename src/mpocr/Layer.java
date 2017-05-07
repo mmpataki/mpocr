@@ -72,7 +72,7 @@ public class Layer {
         
         for (double[] weight : weights) {
             for (int j = 0; j < weights[0].length; j++) {
-                weight[j] = Math.random();
+                weight[j] = Math.random() * Math.pow(-1, (int)(Math.random()*10000));
             }
         }
         if(neuron) {
@@ -89,7 +89,7 @@ public class Layer {
      * @param pActivations 
      */
     public void process(double[][] pWeights, double[] pActivations) {
-        for (int i = 0; i < neurons.length; i++) { 
+        for (int i = 0; i < neurons.length; i++) {
             neurons[i].process(pWeights == null ? null : pWeights[i], pActivations);
         }
         Util.puts("activations(" + index + ") : [");
@@ -158,8 +158,9 @@ public class Layer {
         }
         if(pWeights == null)
             return;
+        
         for (int i = 0; i < pWeights.length; i++) {
-            for (int j = 0; j < pWeights[0].length; j++) {
+            for (int j = 0; j < activations.length; j++) {
                 pWeights[i][j] -= (eta * (activations[j] * neurons[i].getError()));
             }
         }

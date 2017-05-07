@@ -112,7 +112,7 @@ public class NeuralNetwork implements INeuralNetwork {
         for (int i = 0; i < ll.neuronCount(); i++) {
             Neuron n = ll.getNeuron(i);
             n.setError((n.getActivation() - output[i]) * n.getDiffActivation());
-            Util.puts(n.getError() + ", ");
+            Util.puts(n.getError() + ",");
         }
         Util.puts("]\n");
     }
