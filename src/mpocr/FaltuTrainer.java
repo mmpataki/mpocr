@@ -14,56 +14,53 @@ import java.util.Arrays;
 public class FaltuTrainer {
 
     NeuralNetwork network;
+    private int trainingSetSize;
 
-    public FaltuTrainer(NeuralNetwork nw) {
-        network = nw;
+    public FaltuTrainer(NeuralNetwork network, int trainingSetSize) {
+        this.network = network;
+        this.trainingSetSize = trainingSetSize;
     }
     
     public void train() throws Exception {
         
-        double[] op = new double[2];
-        double[] ip = new double[2];
-        int counter = 0;
-        int tsize = 4;
-        int notice = (tsize / 100)|1;
-        for (int i = 0; i < tsize; i++) {
+        int ia, ib, eop;
+        double[] op, ip;
+        TrainingSet set = new TrainingSet();
+        Plotter p = new Plotter("hist.html", "");
+        
+        for (int i = 0; i < trainingSetSize; i++) {
             
-            int ib = /**/i & 1;          /** (int) ((Math.random()* 10000000) % 2);  /**/
-            int ia = /**/((i & 2) >> 1); /** (int) ((Math.random() * 10000000) % 2); /**/
-            int eop= ia | ib;
+            ip = new double[2];
+            op = new double[2];
+            
+            ib = i & 1;
+            ia = ((i & 2) >> 1);
+            
             ip[0] = ia;
             ip[1] = ib;
+            op[(ia | ib)] = 1;
             
-            System.out.println("\nnetwork : " + network);
-            
-            Util.putsf("\ninput [ " + ia + ", " + ib + "]\n");
-            
-            for (int j = 0; j < op.length; j++) op[j] = 0;
-            op[0] = eop;
-            
-            network.propagate(ip, op);
-            
-            double[] aop = network.getOutput();
-            
-            int lop = (aop[0] < 0.5 ? 0 : 1);
-            
-            Util.putsf("\noutput : " + Arrays.toString(aop));
-            Util.putsf("\noutput : [" + lop + "]\n");
-            Util.putsf("expected : [" + eop + "]\n");
-            
-            if(lop == eop) {
-                counter++;
-            }
-            
-            if((i % notice)==0) {
-                System.out.print("\rProcessed " + ((i*100.0)/tsize) + "% training set");
-                System.out.flush();
-            }
+            set.add(new TrainingElement(ip, op));
         }
+        
+        
+        p.setType(Plotter.REGION);
+        p.addLayer("green");
+        
+        network.setCallBack(new Callback() {
+            @Override
+            public void function(Object param) {
+                p.chooseLayer(1);
+                p.addPoint(network.getNetworkError());
+                p.chooseLayer(0);
+                p.addPoint(network.getCost());
+            }
+        });
+        
         System.out.println();
-        System.out.println("training set size: " + tsize);
-        System.out.println("Correct outputs  : " + counter);
-        System.out.println("Accuracy         : " + ((counter*100.0)/(double)tsize) + "%");
+        System.out.println("training set size: " + trainingSetSize);
+        System.out.println("Accuracy         : " + network.getTrainingAccuracy() + "%");
+        p.plot();
     }
 }
 

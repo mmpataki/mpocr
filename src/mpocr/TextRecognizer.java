@@ -24,7 +24,7 @@ public class TextRecognizer {
     public ArrayList extract() {
         
         if (!image.isBinarized()) {
-            image.xbinarize();
+            image.binarize();
         }
         
         Segment[] segs = Segmentation.segmentImage(image);

@@ -12,20 +12,21 @@ function convert_to_png(svg) {
 	document.body.appendChild(img);
 }
 
-window.onresize = window.onload = function dgs() {
-	mdiv = document.getElementById("mdiv");
+window.onload = window.resize = function() {
 	var xs = document.getElementsByClassName("mchart");
-	for (var i = 0; i < xs.length; i++) {
-
-		if(xs[i].children[0] == null) {
-			var ele = document.createElement("div");
-			ele.style.display = "block";
-			ele.style.height = "100%";
-			xs[i].appendChild(ele);
-		}
-
-		draw_chart(xs[i].children[0], JSON.parse(xs[i].getAttribute("gdata")));
+	for(var i=0; i<xs.length; i++) {
+		dg(xs[i]);
 	}
+}
+
+function dg(xs) {
+	if(xs.children[0] == null) {
+		var ele = document.createElement("div");
+		ele.style.display = "block";
+		ele.style.height = "100%";
+		xs.appendChild(ele);
+	}
+	draw_chart(xs.children[0], JSON.parse(xs.getAttribute("gdata")));
 }
 
 function draw_chart(ele, gdata) {
@@ -111,7 +112,7 @@ function draw_chart(ele, gdata) {
 			if(gdata.type == "dot") {
 				dtemp += `<polyline style='fill:none; stroke:${dataset.stroke}; stroke-width:2px;' points='${points}'/>${ctemp}`;
 			} else {
-				dtemp += `<polygon style='fill: ${dataset.fill}; stroke:${dataset.fill}; opacity: ${dataset.opacity}; stroke-width:2px;' points='${points} ${wd},${y} ${wd},${ht} ${xoff},${ht} ${xoff},${(ht-(yaspect*dataset.data[0]))} ${xoff}'/>${ctemp}`;
+				dtemp += `<polygon style='fill: ${dataset.fill}; stroke:${dataset.fill}; opacity: ${dataset.opacity}; stroke-width:2px;' points='${points} ${wd},${y} ${wd},${ht} ${xoff},${ht} ${xoff},${(ht-(yaspect*dataset.data[0]))}'/>${ctemp}`;//${xoff}
 			}
 
 			ctemp = "";

@@ -39,8 +39,9 @@ public class Matrix {
     }
     /**
      * Transposes the matrix itself.
+     * @throws mpocr.MatrixException
      */
-    public void transpose() throws Exception {
+    public void transpose() throws MatrixException {
         double[][] dest = matrix;
         if(rows != cols) {
             dest = new double[cols][rows];
@@ -52,23 +53,23 @@ public class Matrix {
     /**
      * @param matrix: the matrix to be transposed
      * @return returns the transpose of the supplied matrix
-     * @throws Exception 
+     * @throws MatrixException
      */
-    public static double[][] transpose(double[][] matrix) throws Exception {
+    public static double[][] transpose(double[][] matrix) throws MatrixException {
         if(matrix.length == 0 || matrix[0].length == 0) {
-            throw new Exception("Null matrix supplied for transpose");
+            throw new MatrixException("Null matrix supplied for transpose");
         }
         double[][] dest = new double[matrix[0].length][matrix.length];
         copy(dest, matrix);
         transpose(dest, matrix);
         return dest;
     }
-    private static void transpose(double[][] dest, double[][] matrix) throws Exception {
+    private static void transpose(double[][] dest, double[][] matrix) throws MatrixException {
         
         if(matrix.length == 0 || matrix[0].length == 0 ||
                 dest.length < matrix[0].length ||
                 dest[0].length < matrix.length) {
-            throw new Exception("Null/Incompatible-dest matrix supplied for transpose");
+            throw new MatrixException("Null/Incompatible-dest matrix supplied for transpose");
         }
         int rows = matrix.length;
         int cols = matrix[0].length;
@@ -80,23 +81,23 @@ public class Matrix {
             }
         }
     }
-    public Matrix multiply(Matrix x) throws Exception {
+    public Matrix multiply(Matrix x) throws MatrixException {
         Matrix m = new Matrix(rows, x.cols);
         multiply(m.matrix, matrix, x.matrix);
         return m;
     }
     
-    public static void multiply(double[][] dest, double[][] a, double[][] b) throws Exception {
+    public static void multiply(double[][] dest, double[][] a, double[][] b) throws MatrixException {
         if(
                 a == null || b == null || dest == null ||
                 a.length == 0 || b.length == 0 || dest.length == 0) {
             throw new NullPointerException("Matrices are null");
         }
         if(a[0].length != b.length) {
-            throw new Exception("matrices are multiplication incompatible");
+            throw new MatrixException(a.length, a[0].length, b[0].length);
         }
         if(dest.length < a.length || dest[0].length < b[0].length) {
-            throw new Exception("Output matrix size is small");
+            throw new MatrixException("Output matrix size is small");
         }
         int m = a.length, n = a[0].length, p = b[0].length;
         for (int i = 0; i < m; i++) {

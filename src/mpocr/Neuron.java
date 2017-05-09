@@ -40,6 +40,10 @@ class Neuron {
                 winput += pWeights[i] * pActivations[i];
             }
         }
+        
+        //CHECK
+        bias = 0;
+        
         activation = afunc.fire(winput + bias);
         return activation;
     }
@@ -72,7 +76,7 @@ class Neuron {
         return winput + bias;
     }
     public void setBias(double d) {
-        bias = d;
+        bias = 0;//d;
     }
     @Override
     public String toString() {

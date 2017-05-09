@@ -33,9 +33,11 @@ public class Layer {
      * weights : weight matrix of this layer. The format must be transpose
      *      matrix of the matrix containing the weights emerging out of each
      *      neuron in a row. if provided null the layer will randomize it
+     * biases : biases for the neurons. If provided null random values will
+     *      be assigned to them automatically.
      */
     Layer(int ncount, int nncount, double[][] weights,
-            double[] biases, ActivationFunction afunc, int index) throws Exception {
+            double[] biases, ActivationFunction afunc, int index) throws NeuralNetworkException {
         
         if(
             ncount == 0 || nncount == 0 ||
@@ -49,14 +51,11 @@ public class Layer {
                 (biases != null && ncount != biases.length)
             )
         ) {
-            throw new Exception("The number of weights didn't match");
+            throw new NeuralNetworkException("The number of weights didn't match");
         }
         
         neurons = new Neuron[ncount];
         for (int i = 0; i < ncount; i++) {
-            /* Please note : if the biase is null then neuron is asked to
-             * randomize the bias implicitly
-             */
             neurons[i] = new Neuron((biases == null ? null : biases[i]), afunc, i);
         }
         
@@ -99,23 +98,38 @@ public class Layer {
         Util.puts("]\n");
     }
     
-    public void computeErrors(double[] errors) throws Exception {
-        
-        double[][] twts = Matrix.transpose(weights);
-        double[][] terr = Matrix.transpose(new double[][]{errors});
-        double[][] err  = new double[twts.length][1];
-        double[]   acts = new double[neuronCount()];
-        
-        Matrix.multiply(err, twts, terr);
-        
-        Util.puts("errors [");
-        for(int i = 0; i<neuronCount(); i++) {
-            err[i][0] *= neurons[i].getDiffActivation();
-            neurons[i].setError(err[i][0]);
-            Util.puts(err[i][0] + ", ");
+    public double computeErrors(double[] nextErrors) {
+
+        double[][] transposeWeights, tmpErrors, errors;
+        double totalError = 0, avgError;
+
+        try {
+
+            transposeWeights = Matrix.transpose(weights);
+            tmpErrors = Matrix.transpose(new double[][]{nextErrors});
+            errors = new double[transposeWeights.length][1];
+
+            Matrix.multiply(errors, transposeWeights, tmpErrors);
+
+            Util.puts("errors [");
+            for (int i = 0; i < neuronCount(); i++) {
+                
+                errors[i][0] *= neurons[i].getDiffActivation();
+                totalError += errors[i][0];
+                
+                avgError = (neurons[i].getError() + errors[i][0]) / 2;
+                
+                neurons[i].setError(avgError);
+                Util.puts(errors[i][0] + ", ");
+            }
+            Util.puts("]\n");
+
+        } catch (MatrixException me) {
+            System.err.println(me.toString());
         }
-        Util.puts("]\n");
+        return totalError;
     }
+    
     
     public Neuron getNeuron(int index) {
         if(index < 0 || index >= neurons.length)
@@ -172,6 +186,10 @@ public class Layer {
         toret += "\t\tweights : " + Arrays.deepToString(weights) + "\n";
         toret += "\t\tneurons : " + Arrays.deepToString(neurons) + "\n";
         return toret + "\t}";
+    }
+
+    public Neuron[] getNeurons() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

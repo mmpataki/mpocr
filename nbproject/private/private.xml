@@ -4,21 +4,17 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MainPage.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/OImage.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Segment.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Zones.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/FaltuTrainer.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/SigmoidFunction.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MNistReader.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Trainer.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MNistTrainer.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/NeuralNetwork.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Neuron.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Util.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/BasicImage.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/TrainingDataLoader.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/NeuralNetworkException.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/FaltuTrainer.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/TrainingSet.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/TextRecognizer.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Layer.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Segmentation.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MNistTrainer.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Matrix.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/NeuralNetwork.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/TrainingElement.java</file>
         </group>
     </open-files>
 </project-private>

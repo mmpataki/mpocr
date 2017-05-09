@@ -46,25 +46,49 @@ public class MNistTrainer {
         MNistReader reader = new MNistReader(lblfile, imgfile, tsize);
         imgs = reader.loadDigitImages();
         
+        double[] x = imgs.get(0).getData();
+        
+        for (int i = 0; i < x.length; i++) {
+            if(i % 28 == 0){
+                System.out.println();
+            }
+            System.out.print(((int)x[i]));
+        }
+        
         System.out.println("Loading done....");
     }
 
     public void train() throws Exception {
-        train_n_test(true);
+        
+        if (imgs == null) {
+            loadTrainingSet();
+        }
+        
+        TrainingSet set = new TrainingSet();
+        double[] expectedOutput;
+        
+        for (DigitImage img : imgs) {
+            expectedOutput = new double[10];
+            expectedOutput[img.getLabel()] = 1;
+            set.add(new TrainingElement(img.getData(), expectedOutput));
+        }
+        
+        network.train(set);
     }
     
-    void test() throws Exception {
-        train_n_test(false);
-    }
-    
-    public void train_n_test(boolean train) throws Exception {
+    public void test() throws Exception {
 
         if (imgs == null) {
             loadTrainingSet();
         }
 
         int k = 0, counter = 0;
-        double[] outputVector;
+        double[] outputVector = null;
+        
+        double nwe=0, cost=0;
+        Plotter p = new Plotter("hist.html", "");
+        p.setType(Plotter.REGION);
+        p.addLayer("green");
 
         int mi = 0; //serves as index to maximum value in output vector.
         double m = 0;
@@ -77,16 +101,22 @@ public class MNistTrainer {
             eOutputVector[eop] = 1;
 
             Util.puts("Expected output : [" + (eop) + "]\n");
-
             
-            if(train) { //train
-                network.propagate(pair.getData(), eOutputVector);
-            } else {   //test
-                double[] xip = pair.getData();
-                network.fpropagate(xip);
-            }
+            network.fpropagate(pair.getData());
             outputVector = network.getOutput();
 
+            
+            cost += network.getCost();
+            nwe += network.getNetworkError();
+            
+            if((k % 10) == 0) {
+                p.chooseLayer(1);
+                p.addPoint(nwe / 10);
+                p.chooseLayer(0);
+                p.addPoint(cost / 10);
+                nwe = cost = 0;
+            }
+            
             Util.puts("\nOutput vector " + Arrays.toString(outputVector) + "\n");
 
             mi = 0;
@@ -97,11 +127,7 @@ public class MNistTrainer {
                     mi = i;
                 }
             }
-            
-            //if(!train) 
-            {
-                Util.putsf(" eop : " + eop + " op : " +  mi + " with " + m + Arrays.toString(outputVector) + "\n");
-            }
+            Util.putsf(" eop : " + eop + " op : " +  mi + " with " + m + Arrays.toString(outputVector) + "\n");
             
             Util.puts(" op [" + (mi) + "]");
             if (mi == eop) {
@@ -110,14 +136,14 @@ public class MNistTrainer {
             }
             Util.puts("\n");
             
-            //flush the expected output vector for reuse.
-            eOutputVector[eop] = 0;
             k++;
         }
         System.out.println();
+        System.out.println(Arrays.toString(outputVector));
         System.out.println("training set size: " + k);
         System.out.println("Correct outputs  : " + counter);
         System.out.println("Accuracy         : " + ((counter * 100.0) / (double) k) + "%");
+        p.plot();
     }
 
 }
