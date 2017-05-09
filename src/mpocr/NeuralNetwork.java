@@ -156,7 +156,7 @@ public class NeuralNetwork implements INeuralNetwork {
             }
         }
     }
-
+    
     public double[] getOutput() {
         return layers.get(layers.size() - 1).getActivations();
     }

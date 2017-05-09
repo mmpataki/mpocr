@@ -32,8 +32,7 @@ class Neuron {
     /* calculates the activation of this neuron. */
     public double process(double pWeights[], double pActivations[]) {
         if(pWeights == null) {
-            try {
-            winput = pActivations[index];}catch(Exception s){System.out.println(index + "here with size : " + pActivations.length);}
+            winput = pActivations[index];
         } else {
             winput = 0.0;
             for (int i = 0; i < Util.minlen(pWeights, pActivations); i++) {

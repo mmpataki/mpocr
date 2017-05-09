@@ -17,20 +17,18 @@ import java.nio.file.Paths;
  * @author mmp
  */
 public class TrainingDataLoader {
-
-    String dirpath;
-    byte[] chars8;
-    TrainingSet trainingSet = null;
-    int outputSize;
     
-    TrainingDataLoader(
-            String dirpath,
-            String charactersFile,
-            String fontsFile,  /* not used */
-            String stylesFile, /* not used */
-            int outputSize
-    ) throws FileNotFoundException, IOException, Exception {
+    public static TrainingSet load (
+                    String dirpath,
+                    String charactersFile,
+                    String fontsFile,  /* not used */
+                    String stylesFile, /* not used */
+                    int outputSize
+                ) throws FileNotFoundException, IOException {
 
+        byte[] chars8;
+        TrainingSet trainingSet;
+        
         int i = 0;
         String line;
         chars8 = new byte[128];
@@ -42,21 +40,9 @@ public class TrainingDataLoader {
                 );
         BufferedReader br = new BufferedReader(reader);
 
-        this.dirpath = dirpath;
-        this.outputSize = outputSize;
         while ((line = br.readLine()) != null) {
             chars8[i++] = (byte) line.charAt(0);
         }
-    }
-
-    public int size() {
-        return trainingSet.size();
-    }
-    
-    public void load() {
-
-        if(trainingSet != null)
-            return;
         
         double[] expectedOutput;
         File folder;
@@ -79,8 +65,10 @@ public class TrainingDataLoader {
             if (!oi.isBinarized()) {
                 oi.xbinarize();
             }
-            Segment[] segs = Segmentation.segmentImage(oi);
-
+            
+            //Segment[] segs = Segmentation.segmentImage(oi);
+            Segment[] segs = { new Segment(oi.getImageData()) };
+            
             for (Segment seg : segs) {
                 if (seg.getHeight() < 3 || seg.getWidth() < 3) {
                     continue;
@@ -92,15 +80,12 @@ public class TrainingDataLoader {
                 expectedOutput[asciiop] = 1;
                 trainingSet.add(
                         new TrainingElement(
-                                seg.features.get(Zones.magic).getFeatures(),
+                                seg.features.get(PixelBuffer.magic).getFeatures(),
                                 expectedOutput
                         )
                 );
             }
         }
-    }
-
-    public TrainingSet getTrainingSet() {
         return trainingSet;
     }
 }

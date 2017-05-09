@@ -30,10 +30,10 @@ public class MainPage extends javax.swing.JFrame {
         
         //int[] nnnc = {2, 3, 2};
         //int[] nnnc = {784, 30, 10};  // mnist database
-        int[] nnnc = {9,50,90,128};  // my mpocr
+        int[] nnnc = {100,20,128};  // my mpocr
         try {
             //net = new NeuralNetwork(nnnc, wts, biases, new SigmoidFunction(), 0.02, 10);
-            net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.001, 10);
+            net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.0001, 30);
         } catch (Exception ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -205,9 +205,10 @@ public class MainPage extends javax.swing.JFrame {
         
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
-        String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
+        //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed.jpeg"; //full noisy, small font
         //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed1.png";   //less noisy
+        String path = "/home/mmp/Desktop/foo/6-20-1-1.png";
         
         if(hack.isSelected()) {
         canvas.setImage(path);
@@ -232,14 +233,18 @@ public class MainPage extends javax.swing.JFrame {
         
         try {                                      
             
+            //TESTING_PHASE
+            //PixelBuffer pb = new PixelBuffer(new Segment(canvas.iData));
+            //-------------
+            
+            
             Plotter p = new Plotter("hist.html", "");
-            TrainingDataLoader loader = new TrainingDataLoader(
+            TrainingSet set = TrainingDataLoader.load(
                                             "/home/mmp/Desktop/foo/", 
                                             "charcterindex.txt",
                                             "", "", 128
                                         );
 
-            loader.load();
             p.setType(Plotter.REGION);
             p.addLayer("green");
             
@@ -253,10 +258,10 @@ public class MainPage extends javax.swing.JFrame {
                 }
             });
             
-            net.train(loader.getTrainingSet());
+            net.train(set);
             
             System.out.println();
-            System.out.println("training set size: " + loader.size());
+            System.out.println("training set size: " + set.size());
             System.out.println("Accuracy         : " + net.getTrainingAccuracy() + "%");
             p.plot();
             
