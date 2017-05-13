@@ -13,14 +13,22 @@ import java.util.ArrayList;
  */
 public class NeuralNetwork implements INeuralNetwork {
 
+    static NeuralNetwork load(String choseFile) {
+        return null;
+    }
+
     ArrayList<Layer> layers;
     double[][] inputWeights;
+    TrainingElement currentElement;
     ActivationFunction afunc;
     double learningRate;
     double cost, totalError;
     private int epochSize;
     Callback callBack;
     private double trainingAccuracy;
+    private double maxError = 0.0;
+    private int currentIteration;
+    private int maxIterations = Integer.MAX_VALUE;
 
     /**
      * To create a neural network only first and last params are enough Others
@@ -33,6 +41,7 @@ public class NeuralNetwork implements INeuralNetwork {
      * network will randomize it.
      * @param afunc: Activation function used for the network.
      * @param learningRate: learningRate of network.
+     * @param epochSize : number of iterations before each GD. (for SGD)
      * @throws NeuralNetworkException on invalid weight and bias matrix size.
      */
     public NeuralNetwork(
@@ -109,6 +118,20 @@ public class NeuralNetwork implements INeuralNetwork {
         return totalError;
     }
 
+    public void setMaxIterations(int maxIterations) {
+        this.maxIterations = maxIterations == 0 ?
+                                    Integer.MAX_VALUE :
+                                    maxIterations;
+    }
+
+    public void setMaxError(double maxError) {
+        this.maxError = maxError;
+    }
+
+    public TrainingElement getCurrentTrainingElement() {
+        return currentElement;
+    }
+
     /**
      * Trains the Neural Network with the given TrainingSet.
      *
@@ -116,70 +139,77 @@ public class NeuralNetwork implements INeuralNetwork {
      */
     public void train(TrainingSet set) {
 
-        int currentIndex = 0;
+        int currentIndex;
+        double[] input, expectedOutput;
+
+        currentIndex = 0;
         trainingAccuracy = 0;
+        currentIteration = 0;
 
-        for (TrainingElement element : set.getElements()) {
+        do {
 
-            double[] input = element.getInputVector();
-            double[] expectedOutput = element.getExpectedOutput();
-
-            /* propagate forward */
-            fpropagate(input);
-
-            currentIndex++;
             totalError = 0;
 
-            computeLastLayerError(expectedOutput);
+            for (TrainingElement element : set.getElements()) {
 
-            /* Now propagate the error backwards to find the gradient. */
-            for (int i = layersCount() - 2; i > 0; i--) {
-                totalError += layers.get(i).computeErrors(layers.get(i + 1).getErrors());
-            }
+                input = element.getInputVector();
+                expectedOutput = element.getExpectedOutput();
 
-            /* gradient-descent only after completion of an epoch. */
-            if ((currentIndex % epochSize) == 0) {
+                currentIndex++;
+                currentElement = element;
 
-                //now correct errors
-                for (int i = layersCount() - 1; i > 0; i--) {
-                    layers.get(i).correctErrors(
-                            (i == 0) ? input : layers.get(i - 1).getActivations(),
-                            (i == 0) ? null : layers.get(i - 1).getWeights(),
-                            learningRate,
-                            i
-                    );
+                /* propagate forward */
+                fpropagate(input);
+
+                computeLastLayerError(expectedOutput);
+
+                /* Now propagate the error backwards to find the gradient. */
+                for (int i = layersCount() - 2; i > 0; i--) {
+                    layers.get(i).computeErrors(layers.get(i + 1).getErrors());
                 }
 
-                if (callBack != null) {
-                    callBack.function(this);
+                /* gradient-descent only after completion of an epoch. */
+                if ((currentIndex % epochSize) == 0) {
+
+                    /* now correct errors */
+                    for (int i = layersCount() - 1; i > 0; i--) {
+                        layers.get(i).correctErrors(
+                                (i == 0) ? input : layers.get(i - 1).getActivations(),
+                                (i == 0) ? null : layers.get(i - 1).getWeights(),
+                                learningRate,
+                                i
+                        );
+                    }
                 }
             }
-        }
+            if (callBack != null) {
+                callBack.function(this);
+            }
+            currentIteration++;
+        } while (maxError < totalError && currentIteration < maxIterations);
+
     }
-    
+
     public double[] getOutput() {
         return layers.get(layers.size() - 1).getActivations();
     }
 
     private void computeLastLayerError(double[] output) {
-        double diff, err;
+        double err, errSum, diff;
         Layer lastLayer;
         Neuron neuron;
 
+        errSum = 0;
         lastLayer = layers.get(layersCount() - 1);
-        cost = 0;
-        Util.puts("errors [");
+
         for (int i = 0; i < lastLayer.neuronCount(); i++) {
             neuron = lastLayer.getNeuron(i);
             diff = (neuron.getActivation() - output[i]);
-            cost += diff * diff;
             err = diff * neuron.getDiffActivation();
-            totalError += err;
+            errSum += (diff * diff);
             neuron.setError(err);
-            Util.puts(neuron.getError() + ",");
         }
-        cost /= 2;
-        Util.puts("]\n");
+        totalError += errSum / 2;
     }
 
     public void fpropagate(double[] input) {
@@ -207,5 +237,9 @@ public class NeuralNetwork implements INeuralNetwork {
 
     public double getTrainingAccuracy() {
         return trainingAccuracy;
+    }
+
+    public void save(String storePath) {
+
     }
 }

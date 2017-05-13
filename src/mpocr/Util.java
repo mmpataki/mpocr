@@ -5,6 +5,10 @@
  */
 package mpocr;
 
+import java.awt.Component;
+import java.io.File;
+import javax.swing.JFileChooser;
+
 /**
  *
  * @author mmp
@@ -18,9 +22,25 @@ class Util {
     public static void puts(String toput) {
         //System.out.print(toput);
     }
-    //forced output twiddle a character and force it off.
+    
+    /* forced output twiddle a character of puts and force output off. */
     public static void putsf(String toput) {
         System.out.print(toput);
+    }
+    
+    public static String choseFile(boolean chooseDirectory, Component parent, String title) {
+        String path = "";
+        JFileChooser ch = new JFileChooser();
+        ch.setDialogTitle(title);
+        
+        if(chooseDirectory) {
+            ch.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        }
+        if (ch.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+            File file = ch.getSelectedFile();
+            path = file.getAbsolutePath();
+        }
+        return path;
     }
     
     /*
@@ -61,5 +81,9 @@ class Util {
 
     static int minlen(double[] a, double[] b) {
         return a.length<b.length?a.length:b.length;
+    }
+
+    static void putsf(double[] features) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

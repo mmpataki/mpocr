@@ -98,10 +98,10 @@ public class Layer {
         Util.puts("]\n");
     }
     
-    public double computeErrors(double[] nextErrors) {
+    public void computeErrors(double[] nextErrors) {
 
         double[][] transposeWeights, tmpErrors, errors;
-        double totalError = 0, avgError;
+        double avgError;
 
         try {
 
@@ -111,23 +111,16 @@ public class Layer {
 
             Matrix.multiply(errors, transposeWeights, tmpErrors);
 
-            Util.puts("errors [");
             for (int i = 0; i < neuronCount(); i++) {
                 
                 errors[i][0] *= neurons[i].getDiffActivation();
-                totalError += errors[i][0];
-                
                 avgError = (neurons[i].getError() + errors[i][0]) / 2;
-                
                 neurons[i].setError(avgError);
-                Util.puts(errors[i][0] + ", ");
             }
-            Util.puts("]\n");
 
         } catch (MatrixException me) {
             System.err.println(me.toString());
         }
-        return totalError;
     }
     
     

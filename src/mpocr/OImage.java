@@ -3,6 +3,7 @@ package mpocr;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -52,13 +53,15 @@ class OImage extends BasicImage {
     
     /* to binarize the image */
     public void binarize() {
+        int fg = getForeground();
+        int bg = getBackground();
         for (int i = 1; i < getHeight() - 1; i++) {
             for (int j = 1; j < getWidth() - 1; j++) {
                 int c = iData[i][j];
                 int r = (c & 0xff);
                 int g = (c & 0xff00) >> 8;
                 int b = (c & 0xff0000) >> 16;
-                iData[i][j] = (((r + g + b) / 3) > 128) ? 0 : -1;
+                iData[i][j] = (((r + g + b) / 3) > 128) ? fg : bg;
             }
         }
         binarized = true;
@@ -69,6 +72,7 @@ class OImage extends BasicImage {
         /* first we need to convert image to grayscale*/
         dirty = true;
         grayscale();
+        exportImage("grayscale.jpg");
         int threshold = Threshold();
         int ht = getHeight();
         int wd = getWidth();
@@ -78,6 +82,7 @@ class OImage extends BasicImage {
             }
         }
         binarized = true;
+        exportImage("binarized.jpg");
     }
 
     private int Threshold() {
@@ -179,7 +184,7 @@ class OImage extends BasicImage {
                 int xIntensity = (int) (getLowByte(iData[i][j], 3) * 0.2126 +
                                         getLowByte(iData[i][j], 2) * 0.7152 +
                                         getLowByte(iData[i][j], 0) * 0.0722);
-                iData[i][j] = (xIntensity << 16) | (xIntensity << 8) | (xIntensity);
+                iData[i][j] = xIntensity;
             }
         }
     }

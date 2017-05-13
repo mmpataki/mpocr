@@ -23,17 +23,19 @@ public class TrainingDataLoader {
                     String charactersFile,
                     String fontsFile,  /* not used */
                     String stylesFile, /* not used */
-                    int outputSize
+                    int outputSize,
+                    int featureSetMagic
                 ) throws FileNotFoundException, IOException {
 
         byte[] chars8;
-        TrainingSet trainingSet;
         
-        int i = 0;
+        TrainingSet trainingSet = new TrainingSet();
+        
+        int cnt = 0;
         String line;
         chars8 = new byte[128];
         
-        FileReader reader = new FileReader(
+        FileReader reader = new FileReader (
                     Paths.get(dirpath, charactersFile)
                             .toAbsolutePath()
                             .toString()
@@ -41,14 +43,13 @@ public class TrainingDataLoader {
         BufferedReader br = new BufferedReader(reader);
 
         while ((line = br.readLine()) != null) {
-            chars8[i++] = (byte) line.charAt(0);
+            chars8[cnt++] = (byte) line.charAt(0);
         }
         
         double[] expectedOutput;
         File folder;
 
         folder = new File(dirpath);
-        trainingSet = new TrainingSet();
 
         /* read the directory and populate the training-set */
         for (final File file : folder.listFiles()) {
@@ -58,8 +59,7 @@ public class TrainingDataLoader {
                 continue;
             }
 
-            int index = Integer.parseInt(name.split("-")[0]);
-            int asciiop = chars8[index];
+            int asciiop  = Integer.parseInt(name.split("-")[0]);
 
             OImage oi = new OImage(Paths.get(dirpath, name).toAbsolutePath().toString());
             if (!oi.isBinarized()) {
@@ -78,14 +78,16 @@ public class TrainingDataLoader {
 
                 expectedOutput = new double[outputSize];
                 expectedOutput[asciiop] = 1;
+                
                 trainingSet.add(
                         new TrainingElement(
-                                seg.features.get(PixelBuffer.magic).getFeatures(),
+                                seg.features.get(featureSetMagic).getFeatures(),
                                 expectedOutput
                         )
                 );
             }
         }
+        
         return trainingSet;
     }
 }

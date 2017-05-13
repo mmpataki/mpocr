@@ -47,15 +47,35 @@ public class FaltuTrainer {
         p.setType(Plotter.REGION);
         p.addLayer("green");
         
+        
         network.setCallBack(new Callback() {
             @Override
             public void function(Object param) {
+                
+                System.out.println(network);
+                
+                TrainingElement cte = ((NeuralNetwork)param).getCurrentTrainingElement();
+                
+                double[] eop = cte.getExpectedOutput();
+                double[] aop = network.getOutput();
+                
+                Util.puts(Arrays.toString(cte.getInputVector()) + "\n");
+                Util.puts(Arrays.toString(eop) + "\n");
+                Util.puts(Arrays.toString(aop) + " ");
+                
+                int op = aop[0] > aop[1] ? 0 : 1;
+                
+                System.out.print((eop[op] != 0) ? " :)\n" : "\n");
+                
                 p.chooseLayer(1);
                 p.addPoint(network.getNetworkError());
                 p.chooseLayer(0);
                 p.addPoint(network.getCost());
+                
             }
         });
+        
+        network.train(set);
         
         System.out.println();
         System.out.println("training set size: " + trainingSetSize);

@@ -1,43 +1,44 @@
 package mpocr;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-
 public class MainPage extends javax.swing.JFrame {
 
-    NeuralNetwork net;
-    
-    public MainPage() {
-        
+    private NeuralNetwork net;
+    private Plotter plt;
+    private int featureSetMagic = PixelBuffer.magic;
+    private String storePath;
+
+    public MainPage() throws NeuralNetworkException {
+
+        int[] nnnc = {100, 70, 62};
+
         initComponents();
         canvas.zoomIn(1);
+                
+        plt = new Plotter("error_graph.html", "");
+        net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.43, 1);
         
-        double[][][] wts = {
-            {{1,1}, {1,1}, {1,1}},
-            {{1,1,1},{1,1,1}}
-        };
-        double[][] biases = {
-            {0,0},
-            {0,0,0},
-            {0,0}
-        };
+        net.setMaxError(0.5);
+        net.setMaxIterations(8000);
+        net.setCallBack(new Callback() {
+            @Override
+            public void function(Object param) {
+                System.out.println("Max error : " + net.getNetworkError());
+                plt.addPoint(net.getNetworkError());
+            }
+        });
         
-        //int[] nnnc = {2, 3, 2};
-        //int[] nnnc = {784, 30, 10};  // mnist database
-        int[] nnnc = {100,20,128};  // my mpocr
-        try {
-            //net = new NeuralNetwork(nnnc, wts, biases, new SigmoidFunction(), 0.02, 10);
-            net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.0001, 30);
-        } catch (Exception ex) {
-            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+        /* attach to the visualizer. */
         nnv.setNN(net);
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -56,6 +57,11 @@ public class MainPage extends javax.swing.JFrame {
         Train = new javax.swing.JButton();
         nnv = new mpocr.NNVisualizer();
         ExtractTextButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Output = new javax.swing.JTextArea();
+        Test = new javax.swing.JButton();
+        Load = new javax.swing.JButton();
+        Save = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -93,7 +99,7 @@ public class MainPage extends javax.swing.JFrame {
         );
         canvasLayout.setVerticalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 382, Short.MAX_VALUE)
+            .addGap(0, 406, Short.MAX_VALUE)
         );
 
         jScrollPane2.setViewportView(canvas);
@@ -116,13 +122,38 @@ public class MainPage extends javax.swing.JFrame {
         );
         nnvLayout.setVerticalGroup(
             nnvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 328, Short.MAX_VALUE)
         );
 
         ExtractTextButton.setText("Extract Text");
         ExtractTextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ExtractTextButtonActionPerformed(evt);
+            }
+        });
+
+        Output.setColumns(20);
+        Output.setRows(5);
+        jScrollPane1.setViewportView(Output);
+
+        Test.setText("Test");
+        Test.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TestActionPerformed(evt);
+            }
+        });
+
+        Load.setText("Load");
+        Load.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LoadActionPerformed(evt);
+            }
+        });
+
+        Save.setText("Save");
+        Save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveActionPerformed(evt);
             }
         });
 
@@ -135,8 +166,21 @@ public class MainPage extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(nnv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Train))
+                            .addComponent(jLabel1)
+                            .addComponent(ImagePath))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nnv, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(Train)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Test)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Load)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Save)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -149,12 +193,7 @@ public class MainPage extends javax.swing.JFrame {
                                 .addComponent(ZoomOut)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(ZoomIn))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(ImagePath))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -171,11 +210,17 @@ public class MainPage extends javax.swing.JFrame {
                     .addComponent(Train)
                     .addComponent(ExtractTextButton)
                     .addComponent(hack)
-                    .addComponent(ImportButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(nnv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE))
+                    .addComponent(ImportButton)
+                    .addComponent(Test)
+                    .addComponent(Load)
+                    .addComponent(Save))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(nnv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
 
@@ -202,109 +247,163 @@ public class MainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_ZoomInActionPerformed
 
     private void ImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportButtonActionPerformed
-        
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/AZVF.bmp";
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset1/skewset1.jpg";
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/unskewedLorem.bmp";      //segments perfectly
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed.jpeg"; //full noisy, small font
-        //String path = "/home/mmp/miniproject/project/mpocr/testimages/skewset2/unskewed1.png";   //less noisy
-        String path = "/home/mmp/Desktop/foo/6-20-1-1.png";
-        
-        if(hack.isSelected()) {
+        String path = Util.choseFile(false, MainPage.this, "Choose an Image.");
         canvas.setImage(path);
         canvas.setOffset(0);
         ImagePath.setText("Path : " + path);
-        }
-        else {
-        JFileChooser ch = new JFileChooser();
-        ch.setFileFilter(new BMPImageFilter());
-        ch.setCurrentDirectory(new File(path));
-        if(ch.showOpenDialog(MainPage.this) == JFileChooser.APPROVE_OPTION) {
-            File file = ch.getSelectedFile();
-            path = file.getAbsolutePath();
-            canvas.setImage(path);
-            canvas.setOffset(1);
-            ImagePath.setText("Path : " + path);
-        }
-        }
     }//GEN-LAST:event_ImportButtonActionPerformed
 
     private void TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TrainActionPerformed
-        
-        try {                                      
+        try {
             
-            //TESTING_PHASE
-            //PixelBuffer pb = new PixelBuffer(new Segment(canvas.iData));
-            //-------------
+            //String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
+            String path = "/home/mmp/Desktop/foo/test/";
             
-            
-            Plotter p = new Plotter("hist.html", "");
             TrainingSet set = TrainingDataLoader.load(
-                                            "/home/mmp/Desktop/foo/", 
-                                            "charcterindex.txt",
-                                            "", "", 128
-                                        );
+                    path,
+                    "charcterindex.txt",
+                    "", "", 62,
+                    featureSetMagic
+            );
+            System.out.println("Loading done....");
 
-            p.setType(Plotter.REGION);
-            p.addLayer("green");
-            
-            net.setCallBack(new Callback() {
+            (new Runnable() {
                 @Override
-                public void function(Object param) {
-                    p.chooseLayer(1);
-                    p.addPoint(net.getNetworkError());
-                    p.chooseLayer(0);
-                    p.addPoint(net.getCost());
+                public void run() {
+                    net.train(set);
                 }
-            });
-            
-            net.train(set);
-            
-            System.out.println();
-            System.out.println("training set size: " + set.size());
-            System.out.println("Accuracy         : " + net.getTrainingAccuracy() + "%");
-            p.plot();
-            
-            
-            //(new MNistTrainer(net, "/home/mmp/train-images.idx3-ubyte", "/home/mmp/train-labels.idx1-ubyte", 100)).train();
-            //(new MNistTrainer(net, "/home/mmp/t10k-images.idx3-ubyte", "/home/mmp/t10k-labels.idx1-ubyte", 100)).test();
-             
-        } catch (Exception ex) {
+            }).run();
+
+            System.out.println("Training Done");
+            plt.plot();
+        } catch (IOException ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_TrainActionPerformed
 
-    int ip = 0;
     private void ExtractTextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExtractTextButtonActionPerformed
 
-        int a = ip & 1;
-        int b = (ip & 2) >> 1;
-        ip++;
-        double[] ips = new double[2];
-        ips[0]=a; ips[1]=b;
-        net.fpropagate(ips);
-        double[] op = net.getOutput();
-        System.out.println("ip " + a + ", " + b);
-        System.out.println(op[0]>op[1]?0:1);
+        String output = "", soutput = "";
+        double[] op;
 
-        if(canvas.oimg != null) {
-            ArrayList<Character> chars = (new TextRecognizer(net, canvas.oimg)).extract();
-            for (Character aChar : chars) {
-                System.out.print(aChar);// + " [" + ((int)aChar) + "]\n");
+        canvas.oimg.xbinarize();
+        canvas.redraw();
+
+        Segment[] segs = Segmentation.segmentImage(canvas.oimg);
+        for (Segment seg : segs) {
+
+            if (seg.getHeight() < 4 || seg.getWidth() < 4) {
+                continue;
             }
+
+            Segment tmp = new Segment(
+                    seg.getBounded()
+                    .resizeImage(100, 100)
+                    .getImageData()
+            );
+
+            tmp.extractFeatures();
+
+            net.fpropagate(tmp.features.get(featureSetMagic).getFeatures());
+            op = net.getOutput();
+
+            int mi = 0;
+            for (int j = 0; j < op.length; j++) {
+                if (op[j] > op[mi]) {
+                    mi = j;
+                }
+            }
+            output += " [" + mi + "] : ";
+            if (mi < 10) {
+                mi += '0';
+            } else if (mi <= 36 && mi > 10) {
+                mi += 'a' - 10;
+            } else {
+                mi += 'A' - 36;
+            }
+            
+            output += ((char) mi);
+            soutput += ((char) mi);
         }
+        System.out.println(output);
+        Output.setText(soutput);
     }//GEN-LAST:event_ExtractTextButtonActionPerformed
+
+    private void TestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TestActionPerformed
+        try {
+
+            int correct = 0, uni = 0;
+            int[] opset = new int[62];
+
+            //String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
+            String path = "/home/mmp/Desktop/foo/test/";
+            
+            TrainingSet set = TrainingDataLoader.load(
+                    path,
+                    "charcterindex.txt",
+                    "", "", 62,
+                    featureSetMagic
+            );
+
+            double[] op;
+            double[] eop;
+
+            for (int i = 0; i < set.size(); i++) {
+
+                net.fpropagate(set.elementAt(i).getInputVector());
+                op = net.getOutput();
+                
+                eop = set.elementAt(i).expectedOutput;
+                int mi = 0;
+                for (int j = 0; j < op.length; j++) {
+                    if (op[j] > op[mi]) {
+                        mi = j;
+                    }
+                }
+                
+                if (opset[mi] == 0) {
+                    uni++;
+                }
+                opset[mi]++;
+
+                if (eop[mi] == 1) {
+                    correct++;
+                }
+            }
+
+            System.out.println(Arrays.toString(opset));
+            System.out.println("Unique : " + uni + "");
+            System.out.println(correct);
+            System.out.println("Accuracy : " + ((double) correct / set.size()) * 100.0);
+        } catch (IOException ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TestActionPerformed
+
+    private void LoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadActionPerformed
+        net = NeuralNetwork.load(storePath);
+    }//GEN-LAST:event_LoadActionPerformed
+
+    private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
+        net.save(storePath);
+    }//GEN-LAST:event_SaveActionPerformed
 
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainPage.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new MainPage().setVisible(true);
+            try {
+                new MainPage().setVisible(true);
+            } catch (NeuralNetworkException ex) {
+                Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 
@@ -312,6 +411,10 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JButton ExtractTextButton;
     private javax.swing.JLabel ImagePath;
     private javax.swing.JButton ImportButton;
+    private javax.swing.JButton Load;
+    private javax.swing.JTextArea Output;
+    private javax.swing.JButton Save;
+    private javax.swing.JButton Test;
     private javax.swing.JButton Train;
     private javax.swing.JButton ZoomIn;
     private javax.swing.JButton ZoomOut;
@@ -319,6 +422,7 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JCheckBox hack;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private mpocr.NNVisualizer nnv;
     // End of variables declaration//GEN-END:variables

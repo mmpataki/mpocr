@@ -39,10 +39,7 @@ class Neuron {
                 winput += pWeights[i] * pActivations[i];
             }
         }
-        
-        //CHECK
-        bias = 0;
-        
+
         activation = afunc.fire(winput + bias);
         return activation;
     }
@@ -55,9 +52,6 @@ class Neuron {
     }
     public double getBias() {
         return bias;
-    }
-    public double getOldBias() {
-        return oldbias;
     }
     public final void randomize() {
         this.bias = Math.pow(-1, (int)(Math.random()*100)) * Math.random();
@@ -75,7 +69,7 @@ class Neuron {
         return winput + bias;
     }
     public void setBias(double d) {
-        bias = 0;//d;
+        bias = d;
     }
     @Override
     public String toString() {

@@ -14,9 +14,6 @@ public interface IFeatureSet {
     /* return magic number of this featureset. */
     public int getmagic();
     
-    /* return comparison percentage of the two FeatureSet */
-    public double compare(FeatureSet fs1, FeatureSet fs2);
-    
     /* to print features */
     public void printFeatures();
 

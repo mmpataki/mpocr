@@ -36,12 +36,12 @@ class BasicImage implements IImage {
     /* to get the foreground and background color of the image */
     @Override
     public int getForeground() {
-        return -1;
+        return 0;
     }
 
     @Override
     public int getBackground() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -137,4 +137,100 @@ class BasicImage implements IImage {
         }
         return 0;
     }
+    
+    /**
+     * Resizes a segment to fixed dimensions.
+     * 
+     * ALGORITHM:
+     * 
+     * 1. Analyze the density of the pixels foreground to background and vice-versa
+     * 2. ldp <-> low density pixel.
+     * 3. Create a buffer B of size of required dimensions.
+     * 4. Fill B with the high density color.
+     * 5. foreach low-density pixel in the original image
+     * 6.     fill the rectangle of size [ycoeff X xcoeff] with ldp
+     * 7. done.
+     * 
+     * @param s
+     * @return 
+     */
+    
+    public BasicImage resizeImage(int HEIGHT, int WIDTH) {
+        
+        int height = this.getHeight();
+        int width = this.getWidth();
+        int fg = this.getForeground();
+        int bg = this.getBackground();
+        int[][] idata = this.getImageData();
+        int[][] data = new int[HEIGHT][WIDTH];
+        
+        int fp = 0, tp = height * width;
+        int ldp = bg, hdp = fg;
+        int lx, ly, hx, hy;
+        
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                fp += (idata[i][j] == fg) ? 1 : 0;
+            }
+        }
+        
+        if(fp == 0) {
+            return null;
+        }
+        
+        /*
+         * bias here helps where the foreground and backgrounds are in almost
+         * same proportion.
+         */
+        double bias = 0.2;
+        if(fp < (tp - fp)) {
+            ldp = fg;
+            hdp = bg;
+        }
+        
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                data[i][j] = hdp;
+            }
+        }
+        
+        double xcoeff = (double)WIDTH / width;
+        double ycoeff = (double)HEIGHT / height;
+        
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                
+                if(idata[i][j] == hdp)
+                    continue;
+                
+                lx = (int)(j * xcoeff);
+                ly = (int)(i * ycoeff);
+                
+                hy = (int) (ly + ycoeff);
+                hx = (int) (lx + xcoeff);
+                
+                for (int k = ly; k <= hy; k++) {
+                    for (int l = lx; l <= hx; l++) {
+                        if(l < WIDTH && k < HEIGHT)
+                            data[k][l] = ldp;
+                    }
+                }
+            }
+        }
+        
+        
+        /* TESTING PURPOSE *
+        System.out.print("RESIZED IMAGE");
+        for (int i = 0; i < HEIGHT; i++) {
+            System.out.println("");
+            for (int j = 0; j < WIDTH; j++) {
+                System.out.print((data[i][j] == hdp) ? "." : "#");
+                //System.out.print(data[i][j]);
+            }
+        }
+        /**/
+        
+        return new BasicImage(data);
+    }
+    
 }

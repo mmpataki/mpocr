@@ -30,5 +30,9 @@ class TrainingSet {
     ArrayList<TrainingElement> getElements() {
         return set;
     }
+
+    public TrainingElement elementAt(int i) {
+        return set.get(i);
+    }
     
 }

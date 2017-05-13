@@ -32,6 +32,9 @@ class PlotLayer {
     public int size() {
         return data.size();
     }
+    public void flush() {
+        data.clear();
+    }
 }
 
 public class Plotter {
@@ -65,6 +68,16 @@ public class Plotter {
     public void addLayer(String lcolor) {
         dlist.add(new PlotLayer(lcolor, lstroke));
         chooseLayer(choosen + 1);
+    }
+    
+    public void flush() {
+        for (PlotLayer plotLayer : dlist) {
+            plotLayer.flush();
+        }
+    }
+
+    public void setColor(String color) {
+        dlist.get(choosen).fill = color;
     }
     
     public void chooseLayer(int layer) {
@@ -102,11 +115,11 @@ public class Plotter {
         ydivs = Integer.min(20,  Integer.max((int)(maxy-miny), 20));
         
         try {
-            String html = "<html><head><script src=\"" + cpath + "mchartjs.js\"></script><link href=\"" + cpath + "mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head><div class=\"mchart\" style='width: 90%; height: 90%' gdata='" + this.toString() + "'></div></html>";
+            String html = "<html><head><script src=\"" + cpath + "mchartjs.js\"></script><link href=\"" + cpath + "mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head><div class=\"mchart\" style='width: 95%; height: 90%' gdata='" + this.toString() + "'></div></html>";
             (new PrintWriter(ofile)).append(html).flush();
-            Process p = Runtime.getRuntime().exec("firefox hist.html");
+            Process p = Runtime.getRuntime().exec("firefox " + ofile);
         } catch (IOException ex) {
-            Logger.getLogger(OCRCore.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Plotter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

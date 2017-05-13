@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package mpocr;
 
 import java.awt.Color;
@@ -39,12 +44,6 @@ public class mCanvas extends JPanel {
         oimg.printimage();
     }
 
-    public void thin() {
-        if(oimg == null)
-            return;
-        OCRCore.thin1(this); redraw();
-    }
-    
     public void setOffset(int offset) {
         this.offSet = offset;
         repaint();
@@ -71,8 +70,7 @@ public class mCanvas extends JPanel {
         Graphics g = getGraphics();
         for (int i = 0; i < iData.length; i++) {
             for (int j = 0; j < iData[0].length; j++) {
-                iData[i][j] *= iData[i][j] | 0x88651430;
-                g.setColor(new Color(iData[i][j]));
+                g.setColor(new Color(iData[i][j] == 0 ? 0 : 0xffffff));
                 g.fillRect(
                         j * (pixelWidth + offSet),
                         i * (pixelHeight + offSet),
@@ -99,7 +97,7 @@ public class mCanvas extends JPanel {
         
         for (int i = 0; i < iData.length; i++) {
             for (int j = 0; j < iData[0].length; j++) {
-                g.setColor(new Color(iData[i][j]));
+                g.setColor(new Color(iData[i][j] == 0 ? 0 : 0xffffff));
                 g.fillRect(
                         j * (pixelWidth + offSet),
                         i * (pixelHeight + offSet),
@@ -128,7 +126,6 @@ public class mCanvas extends JPanel {
 
     void cover() {
         printMatrix();
-        OCRCore.cover(iData, 0x723478, 0);
         repaint();
     }
     

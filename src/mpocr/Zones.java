@@ -67,11 +67,6 @@ public class Zones extends FeatureSet {
     }
 
     @Override
-    public double compare(FeatureSet fs1, FeatureSet fs2) {
-        return 0.0;
-    }
-
-    @Override
     public void printFeatures() {
         Util.puts("Input vector : [");
         for (double zone : zones) {

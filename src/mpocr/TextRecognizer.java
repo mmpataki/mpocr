@@ -6,6 +6,7 @@
 package mpocr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -31,12 +32,13 @@ public class TextRecognizer {
         ArrayList<Character> output = new ArrayList<>();
 
         for (Segment seg : segs) {
+            
             if (seg.getHeight() < 3 || seg.getWidth() < 3) {
                 continue;
             }
-            seg.printImageForce();
+            
             seg.extractFeatures();
-            network.fpropagate(seg.features.get(Zones.magic).getFeatures());
+            network.fpropagate(seg.features.get(PixelBuffer.magic).getFeatures());
 
             double[] outputVector = network.getOutput();
             int mi = 0;
@@ -48,7 +50,8 @@ public class TextRecognizer {
                     mi = i;
                 }
             }
-            output.add((char)mi);
+            output.add((char)(mi + '0'));
+            System.out.println(Arrays.toString(outputVector));
         }
         return output;
     }
