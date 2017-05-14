@@ -25,8 +25,8 @@ public class MainPage extends javax.swing.JFrame {
         plt = new Plotter("error_graph.html", "");
         net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.43, 1);
         
-        net.setMaxError(0.5);
-        net.setMaxIterations(8000);
+        net.setMaxError(1.6);
+        net.setMaxIterations(800);
         net.setCallBack(new Callback() {
             @Override
             public void function(Object param) {
@@ -257,7 +257,7 @@ public class MainPage extends javax.swing.JFrame {
         try {
             
             //String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
-            String path = "/home/mmp/Desktop/foo/test/";
+            String path = "/home/mmp/Desktop/foo/test";
             
             TrainingSet set = TrainingDataLoader.load(
                     path,
@@ -301,7 +301,8 @@ public class MainPage extends javax.swing.JFrame {
                     .resizeImage(100, 100)
                     .getImageData()
             );
-
+            
+            tmp.printImageForce();
             tmp.extractFeatures();
 
             net.fpropagate(tmp.features.get(featureSetMagic).getFeatures());
@@ -316,17 +317,21 @@ public class MainPage extends javax.swing.JFrame {
             output += " [" + mi + "] : ";
             if (mi < 10) {
                 mi += '0';
-            } else if (mi <= 36 && mi > 10) {
+            } else if (mi < 36 && mi > 9) {
                 mi += 'a' - 10;
             } else {
                 mi += 'A' - 36;
             }
             
+            seg.setDetection((char) mi);
             output += ((char) mi);
             soutput += ((char) mi);
         }
         System.out.println(output);
         Output.setText(soutput);
+        DocumentCreator dc = new DocumentCreator();
+        dc.create(segs);
+        dc.flush("output.html");
     }//GEN-LAST:event_ExtractTextButtonActionPerformed
 
     private void TestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TestActionPerformed
@@ -336,7 +341,7 @@ public class MainPage extends javax.swing.JFrame {
             int[] opset = new int[62];
 
             //String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
-            String path = "/home/mmp/Desktop/foo/test/";
+            String path = "/home/mmp/Desktop/foo/";
             
             TrainingSet set = TrainingDataLoader.load(
                     path,

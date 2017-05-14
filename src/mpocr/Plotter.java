@@ -117,7 +117,7 @@ public class Plotter {
         try {
             String html = "<html><head><script src=\"" + cpath + "mchartjs.js\"></script><link href=\"" + cpath + "mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head><div class=\"mchart\" style='width: 95%; height: 90%' gdata='" + this.toString() + "'></div></html>";
             (new PrintWriter(ofile)).append(html).flush();
-            Process p = Runtime.getRuntime().exec("firefox " + ofile);
+            Runtime.getRuntime().exec("firefox " + ofile);
         } catch (IOException ex) {
             Logger.getLogger(Plotter.class.getName()).log(Level.SEVERE, null, ex);
         }

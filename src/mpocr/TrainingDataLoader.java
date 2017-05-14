@@ -59,7 +59,12 @@ public class TrainingDataLoader {
                 continue;
             }
 
-            int asciiop  = Integer.parseInt(name.split("-")[0]);
+            int asciiop;
+            try {
+                asciiop  = Integer.parseInt(name.split("-")[0]);
+            } catch(NumberFormatException ne) {
+                continue;
+            }
 
             OImage oi = new OImage(Paths.get(dirpath, name).toAbsolutePath().toString());
             if (!oi.isBinarized()) {

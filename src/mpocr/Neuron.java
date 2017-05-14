@@ -11,7 +11,7 @@ package mpocr;
  */
 class Neuron {
     
-    private double bias, oldbias;
+    private double bias;
     private double error;
     private double activation;
     private double winput;
@@ -44,9 +44,6 @@ class Neuron {
         return activation;
     }
     
-    public double getWinput() {
-        return winput;
-    }
     public double getActivation() {
         return activation;
     }

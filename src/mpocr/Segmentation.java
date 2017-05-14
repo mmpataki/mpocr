@@ -29,28 +29,37 @@ class Segmentation {
         ArrayList<Segment> alist = new ArrayList<>();
         int[][] idata = oi.getImageData();
         int fg = oi.getForeground();
-        int up, down;
+        int up = 0, down = 0;
         int left, right;
         int i = 0, j;
         double excuse = 0;
-        
         int iht = idata.length - 1;
         int iwd = idata[0].length - 1;
+        int lineSpacing = 0, prevSpaces;
+        
+        /* we need this dummy element for keep track of initial skipped lines */
+        alist.add(new Segment(new int[1][1]));
+        
         while(i < iht) {
             
-            /* skip the upper empty lines. */
+            /* find out line spacing and attach it to last Segment */
             while(i < iht && Util.isemptyLine(idata[i], fg, 0, idata[i].length, excuse)) i++;
+            lineSpacing = i - up;
             up = i - 1;
+            
+            alist.get(alist.size() - 1).setNextLines(lineSpacing);
+            
             while(i < iht && !Util.isemptyLine(idata[i], fg, 0, idata[i].length, excuse)) i++;
             down = i;
             
-            j = 0;
+            left = j = 0;
             
             /* get the segments in the line range up <-> down */
             while(j < iwd) {
                 
                 /* skip the left empty lines. */
                 while(j < iwd && Util.isemptyCol(idata, up, down, j, fg, excuse)) j++;
+                prevSpaces = j - left;
                 left = j - 1;
                 while(j < iwd && !Util.isemptyCol(idata, up, down, j, fg, excuse)) j++;
                 right = j;
@@ -59,9 +68,9 @@ class Segmentation {
                 for (int k = up + 1; k < down; k++) {
                     System.arraycopy(idata[k], left + 1, seg.iData[k - up - 1], 0, (right - left - 1));
                 }
+                seg.setPrevSpaces(prevSpaces);
                 alist.add(seg);
             }
-            
         }
         
         Segment segs[] = new Segment[alist.size()];
