@@ -129,8 +129,8 @@ public class Plotter {
     public void plot() {
         
         //calculate xdivs and ydivs
-        xdivs = Integer.min(60, maxx);
-        ydivs = Integer.min(20,  Integer.max((int)(maxy-miny), 20));
+        xdivs = Util.min(60, maxx);
+        ydivs = Util.min(20,  Util.max((int)(maxy-miny), 20));
         
         try {
             String html = "<html><head><script src=\"" + cpath + "mchartjs.js\"></script><link href=\"" + cpath + "mchartjs.css\" rel=\"stylesheet\" type=\"text/css\" ></head><div class=\"mchart\" style='width: 95%; height: 90%' gdata='" + this.toString() + "'></div></html>";

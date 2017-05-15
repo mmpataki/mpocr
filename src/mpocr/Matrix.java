@@ -1,6 +1,5 @@
 package mpocr;
 
-import static java.lang.Integer.min;
 import java.util.Arrays;
 
 /**
@@ -151,15 +150,15 @@ public class Matrix {
         }
         copy(matrix, m.matrix);
     }
-    
+
     /**
      * Copies a 2D array into other.
      * @param dest: destination array.
      * @param src : source array.
      */
     public static void copy(double[][] dest, double[][] src) {
-        for (int i = 0; i < min(dest.length, src.length); i++) {
-            System.arraycopy(src[i], 0, dest[i], 0, min(src[0].length, dest[0].length));
+        for (int i = 0; i < Util.min(dest.length, src.length); i++) {
+            System.arraycopy(src[i], 0, dest[i], 0, Util.min(src[0].length, dest[0].length));
         }
     }
 }

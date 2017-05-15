@@ -85,4 +85,18 @@ class Util {
     static int minlen(double[] a, double[] b) {
         return a.length < b.length ? a.length : b.length;
     }
+    
+    
+    public static double min(double a, double b) {
+        return (a < b) ? a : b;
+    }
+    
+    public static int min(int a, int b) {
+        return (a < b) ? a : b;
+    }
+
+    static int max(int a, int b) {
+        return (a < b) ? b : a;
+    }
+    
 }

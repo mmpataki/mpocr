@@ -3,8 +3,6 @@ package mpocr;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import static java.lang.Integer.max;
-import static java.lang.Integer.min;
 import javax.swing.JPanel;
 
 /**
@@ -87,12 +85,12 @@ public class NNVisualizer extends JPanel {
             Layer l = nn.getLayer(i);
             
             ldi[i].nc = l.neuronCount();
-            ldi[i].dnc = min((ldi[i].nc / 13), ldi[i].nc);
+            ldi[i].dnc = Util.min((ldi[i].nc / 13), ldi[i].nc);
             ldi[i].color = 0x256a49;
             ldi[i].fx = ldi[i].x = padding + layer_margin;
             ldi[i].fy = ldi[i].y = padding + (i * ((layer_margin * 2) + layerheight));
-            ldi[i].radius = Integer.max(
-                        Integer.min(
+            ldi[i].radius = Util.max(
+                        Util.min(
                             (layerheight - (2 * node_margin) - textheight),
                             (layerwidth - (2 * ldi[i].dnc * node_margin) - textheight) / ldi[i].dnc
                         ) / 2,
@@ -143,7 +141,7 @@ public class NNVisualizer extends JPanel {
             if(l2 != null && drawlinks) {
                 
                 l2.y += node_margin;
-                int quant = max((l2.dnc / maxconns), 1);
+                int quant = Util.max((l2.dnc / maxconns), 1);
                 
                 for (int k = 0; k < l2.dnc; k += quant) {
                     g.drawLine(

@@ -21,13 +21,15 @@ public class MainPage extends javax.swing.JFrame {
         nnnc.add(100);
         nnnc.add(70);
         nnnc.add(62);
-        
+
         initComponents();
 
         plt = new Plotter("error_graph.html", "");
         net = new NeuralNetwork(nnnc, new SigmoidFunction(), 0, 1);
-        
-        /* attach to the visualizer. */
+
+        /*
+         * attach to the visualizer.
+         */
         nnv.setNN(net);
     }
 
@@ -59,6 +61,7 @@ public class MainPage extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         EpochSize = new javax.swing.JTextField();
         Notice = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -161,6 +164,11 @@ public class MainPage extends javax.swing.JFrame {
 
         PlotChart.setSelected(true);
         PlotChart.setText("Plot Error graph");
+        PlotChart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PlotChartActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Epoch Size");
 
@@ -169,6 +177,8 @@ public class MainPage extends javax.swing.JFrame {
         Notice.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         Notice.setForeground(new java.awt.Color(255, 0, 0));
         Notice.setText(" ");
+
+        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -194,7 +204,7 @@ public class MainPage extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel4)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(MaxIterations))
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,7 +233,8 @@ public class MainPage extends javax.swing.JFrame {
                             .addComponent(ImagePath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jSeparator1))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -231,7 +242,9 @@ public class MainPage extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(44, 44, 44)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ZoomIn)
                     .addComponent(ZoomOut)
@@ -243,11 +256,12 @@ public class MainPage extends javax.swing.JFrame {
                     .addComponent(Save)
                     .addComponent(Notice))
                 .addGap(12, 12, 12)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(LearningRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(PlotChart)
-                    .addComponent(ImagePath, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ImagePath, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(LearningRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)
+                        .addComponent(PlotChart)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -297,38 +311,26 @@ public class MainPage extends javax.swing.JFrame {
 
     private void TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TrainActionPerformed
         try {
-            
+
             String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
             //String path = "/home/mmp/Desktop/foo/test";
-            
+
             try {
                 net.setLearningRate(Double.parseDouble(LearningRate.getText()));
                 net.setMaxError(Double.parseDouble(MaxError.getText()));
                 net.setMaxIterations(Integer.parseInt(MaxIterations.getText()));
                 net.setEpochSize(Integer.parseInt(EpochSize.getText()));
-            } catch(NumberFormatException ne) {
+            } catch (NumberFormatException ne) {
                 notifyUser("Bad training prameter formats");
                 return;
             }
-        
-            if(PlotChart.isSelected()) {
-                net.setTrainingCallBack(new CallBack() {
-                    @Override
-                    public void function(Object param) {
-                        plt.addPoint(net.getNetworkError());
-                        System.out.println(net.getNetworkError());
-                        notifyUser("Error" + net.getNetworkError());
-                    }
-                });
-            }
-            
-            TrainingSet set= TrainingDataLoader.load(path, 62, featureSetMagic);
-            
+
+            TrainingSet set = TrainingDataLoader.load(path, 62, featureSetMagic);
+
             net.train(set);
             notifyUser("Training Done");
-            if(PlotChart.isSelected()) {
+            if (PlotChart.isSelected()) {
                 plt.plot();
-                net.setTrainingCallBack(null);
             }
         } catch (IOException ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
@@ -350,11 +352,8 @@ public class MainPage extends javax.swing.JFrame {
             }
 
             Segment tmp = new Segment(
-                    seg.getBounded()
-                    .resizeImage(100, 100)
-                    .getImageData()
-            );
-            
+                    seg.getBounded().resizeImage(100, 100).getImageData());
+
             net.fpropagate(tmp.getFeature(featureSetMagic).getFeatures());
             op = net.getOutput();
 
@@ -372,7 +371,7 @@ public class MainPage extends javax.swing.JFrame {
             } else {
                 mi += 'A' - 36;
             }
-            
+
             seg.setDetection((char) mi);
             output += ((char) mi);
         }
@@ -390,10 +389,9 @@ public class MainPage extends javax.swing.JFrame {
 
             String path = Util.choseFile(true, MainPage.this, "Choose the training set image folder.");
             //String path = "/home/mmp/Desktop/foo/";
-            
+
             TrainingSet set = TrainingDataLoader.load(
-                    path, 62, featureSetMagic
-            );
+                    path, 62, featureSetMagic);
 
             double[] op;
             double[] eop;
@@ -402,7 +400,7 @@ public class MainPage extends javax.swing.JFrame {
 
                 net.fpropagate(set.elementAt(i).getInputVector());
                 op = net.getOutput();
-                
+
                 eop = set.elementAt(i).getExpectedOutput();
                 int mi = 0;
                 for (int j = 0; j < op.length; j++) {
@@ -410,7 +408,7 @@ public class MainPage extends javax.swing.JFrame {
                         mi = j;
                     }
                 }
-                
+
                 if (opset[mi] == 0) {
                     uni++;
                 }
@@ -425,7 +423,7 @@ public class MainPage extends javax.swing.JFrame {
             System.out.println("Unique : " + uni + "");
             System.out.println(correct);
             System.out.println("Accuracy : " + accuracy);
-            notifyUser("Accuracy : " + (accuracy+"").substring(0, 5) + "%, Unique : " + uni);
+            notifyUser("Accuracy : " + (accuracy + "").substring(0, 5) + "%, Unique : " + uni);
         } catch (IOException ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -449,10 +447,26 @@ public class MainPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_SaveActionPerformed
 
+    private void PlotChartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlotChartActionPerformed
+        if (PlotChart.isSelected()) {
+            net.setTrainingCallBack(new CallBack() {
+
+                @Override
+                public void function(Object param) {
+                    plt.addPoint(net.getNetworkError());
+                    System.out.println(net.getNetworkError());
+                    notifyUser("Error" + net.getNetworkError());
+                }
+            });
+        } else {
+            net.setTrainingCallBack(null);
+        }
+    }//GEN-LAST:event_PlotChartActionPerformed
+
     private void notifyUser(String err) {
         Notice.setText(err);
     }
-    
+
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -460,16 +474,12 @@ public class MainPage extends javax.swing.JFrame {
             System.out.println("Theme error : " + ex);
         }
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            try {
-                new MainPage().setVisible(true);
-            } catch (NeuralNetworkException ex) {
-                Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        try {
+            new MainPage().setVisible(true);
+        } catch (NeuralNetworkException ex) {
+            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField EpochSize;
     private javax.swing.JButton ExtractTextButton;
@@ -494,6 +504,7 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private mpocr.NNVisualizer nnv;
     // End of variables declaration//GEN-END:variables
 }
