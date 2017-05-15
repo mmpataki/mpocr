@@ -1,17 +1,24 @@
 package mpocr;
 
-/**
- * @author mmp
- */
+import java.util.Arrays;
+
+
 class BasicImage implements IImage {
 
+    /* buffer holding image pixels */
     protected int[][] iData;
+    
     /* to check if the buffer 'iData' is dirty. */
     boolean dirty = false;
 
-    /*
-     * constructor for initialising the image.
-     * NOTE: 
+    /* constants used while rotating images */
+    private static final int NREVERSE = 0;
+    private static final int REVERSE = 1;
+    
+    
+    /**
+     * Constructor for initialising the image
+     * NOTE
      *     The iData you send is just referenced from here hence modifications
      *     through other references will be reflecting here. Careful.
      */
@@ -19,58 +26,41 @@ class BasicImage implements IImage {
         this.iData = iData;
     }
 
-    /* dummy constructor. to shut the java compiler mouth. */
+    /* Dummy ctor to shut compiler's mouth while extending this in OImage. */
     BasicImage() {  }
+    
     
     /* for getting the height and width of the image */
     @Override
-    public int getWidth() {
-        return iData.length > 0 ? iData[0].length : 0;
-    }
+    public int getWidth() { return iData.length > 0 ? iData[0].length : 0; }
 
     @Override
-    public int getHeight() {
-        return iData.length;
-    }
+    public int getHeight() { return iData.length; }
 
     /* to get the foreground and background color of the image */
     @Override
-    public int getForeground() {
-        return 0;
-    }
+    public int getForeground() { return 0; }
 
     @Override
-    public int getBackground() {
-        return 1;
-    }
+    public int getBackground() { return 1; }
 
     @Override
-    public int[][] getImageData() {
-        return iData;
-    }
+    public int[][] getImageData() { return iData; }
 
-    public void printimage() {
-        for (int[] row : iData) {
-            Util.puts("\n");
-            for (int j = 0; j < iData[0].length; j++) {
-                Util.puts(row[j] == getBackground() ? "." : "#");
-            }
-        }
-        Util.puts("\n");
-    }
     
-    public void printimageforce() {
+    @Override
+    public String toString() {
+        
+        String toRet = "";
+        
         for (int[] row : iData) {
-            System.out.print("\n");
-            for (int j = 0; j < iData[0].length; j++) {
-                System.out.print(row[j] == getBackground() ? "." : "#");
+            for (int col : row) {
+                toRet += col;
             }
+            toRet += "\n";
         }
-        System.out.print("\n");
+        return toRet += "\n";
     }
-    
-    private static final int NREVERSE = 0;
-    private static final int REVERSE = 1;
 
     /* to rotate the image to given degree */
     public void rotate(double deg) {
@@ -79,9 +69,6 @@ class BasicImage implements IImage {
         double am = Math.abs(m);
         int mx = (int) Math.round((double) 1 / am * iData[0].length);
         int my = (int) Math.round((double) 1 / am * iData.length);
-
-        Util.puts(mx + ", " + my);
-        Util.puts(iData[0].length + ", " + iData.length);
 
         int[][] cp = new int[my][mx];
 
@@ -108,8 +95,6 @@ class BasicImage implements IImage {
         /* find x & y intersection */
         int xc = getXIntersection(iData, NREVERSE);
         int yc = getYIntersection(iData, NREVERSE);
-
-        Util.puts(xc + ", " + yc + " " + iData.length);
 
         for (int i = 1, ic = yc; ic < iData.length; i++, ic++) {
             for (int j = 10, jc = xc; jc < iData[0].length; j++, jc++) {
@@ -182,8 +167,8 @@ class BasicImage implements IImage {
          * bias here helps where the foreground and backgrounds are in almost
          * same proportion.
          */
-        double bias = 0.2;
-        if(fp < (tp - fp)) {
+        double bias = 1.0;
+        if(fp < (tp - fp) * bias) {
             ldp = fg;
             hdp = bg;
         }
@@ -217,18 +202,6 @@ class BasicImage implements IImage {
                 }
             }
         }
-        
-        
-        /* TESTING PURPOSE *
-        System.out.print("RESIZED IMAGE");
-        for (int i = 0; i < HEIGHT; i++) {
-            System.out.println("");
-            for (int j = 0; j < WIDTH; j++) {
-                System.out.print((data[i][j] == hdp) ? "." : "#");
-                //System.out.print(data[i][j]);
-            }
-        }
-        /**/
         
         return new BasicImage(data);
     }

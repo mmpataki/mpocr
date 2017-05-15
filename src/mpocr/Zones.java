@@ -9,7 +9,7 @@ package mpocr;
  *
  * @author mmp
  */
-public class Zones extends FeatureSet {
+public class Zones implements IFeatureSet {
 
     public static final int magic = 0x0001;
     private double zones[];

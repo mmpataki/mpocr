@@ -5,11 +5,13 @@
  */
 package mpocr;
 
+import java.io.Serializable;
+
 /**
  *
  * @author mmp
  */
-class Neuron {
+public class Neuron implements Serializable {
     
     private double bias;
     private double error;
@@ -19,14 +21,10 @@ class Neuron {
     
     ActivationFunction afunc;
     
-    Neuron(Double bias, ActivationFunction afunc, int index) {
-        if(bias == null) {
-            randomize();
-        } else {
-            this.bias = bias;
-        }
+    Neuron(ActivationFunction afunc, int index) {
         this.afunc = afunc;
         this.index = index;
+        randomize();
     }
     
     /* calculates the activation of this neuron. */
@@ -70,8 +68,13 @@ class Neuron {
     }
     @Override
     public String toString() {
-        String toret = "\n\t\t\tneuron[" + index + "]: {";
-        toret += "\n\t\t\t\tbias: " + bias + "\n\t\t\t\terror: " + error + "\n\t\t\t\tactivation: " + activation + "\n\t\t\t\twinput: " + winput;
-        return toret + "\n\t\t\t}";
+        return
+                "\n\t\t\t\t{" + 
+                    "\n\t\t\t\t\tbias: " + bias + "," +
+                    "\n\t\t\t\t\terror: " + error + "," +
+                    "\n\t\t\t\t\tactivation: " + activation + "," +
+                    "\n\t\t\t\t\twinput: " + winput +
+                "\n\t\t\t\t}";
     }
+
 }

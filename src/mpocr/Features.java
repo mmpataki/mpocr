@@ -1,29 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.util.HashMap;
 
 /**
- *
- * @author mmp
+ * A wrapper around all the features. This can help in storing the features
+ * as a collection and accessing them using the KEY as the magic of the
+ * Feature class.
  */
 public class Features {
     
-    private HashMap<Integer, FeatureSet> features;
+    private HashMap<Integer, IFeatureSet> features;
 
     public Features() {
         features = new HashMap<>();
     }
     
-    public void add(FeatureSet set) {
+    public void add(IFeatureSet set) {
         features.put(set.getmagic(), set);
     }
     
-    public FeatureSet get(int magic) {
+    public IFeatureSet get(int magic) {
         return features.get(magic);
     }
     

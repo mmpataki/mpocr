@@ -15,6 +15,7 @@ class OImage extends BasicImage {
     private boolean binarized;
 
     public OImage(String imgpath) {
+        
         this.binarized = false;
         
         readImage(imgpath);
@@ -52,40 +53,30 @@ class OImage extends BasicImage {
     }
     
     /* to binarize the image */
-    public void binarize() {
-        int fg = getForeground();
-        int bg = getBackground();
-        for (int i = 1; i < getHeight() - 1; i++) {
-            for (int j = 1; j < getWidth() - 1; j++) {
-                int c = iData[i][j];
-                int r = (c & 0xff);
-                int g = (c & 0xff00) >> 8;
-                int b = (c & 0xff0000) >> 16;
-                iData[i][j] = (((r + g + b) / 3) > 128) ? fg : bg;
-            }
-        }
-        binarized = true;
-    }
-
-    /* to binarize the image */
     public void xbinarize() {
+        
+        int threshold, ht, wd, bg, fg;
+        
         /* first we need to convert image to grayscale*/
-        dirty = true;
         grayscale();
         exportImage("grayscale.jpg");
-        int threshold = Threshold();
-        int ht = getHeight();
-        int wd = getWidth();
+        
+        wd = getWidth();
+        ht = getHeight();
+        fg = getForeground();
+        bg = getBackground();
+        threshold = threshold();
+        
         for (int i = 0; i < ht; i++) {
             for (int j = 0; j < wd; j++) {
-                iData[i][j] = (iData[i][j] < threshold) ? getBackground() : getForeground();
+                iData[i][j] = (iData[i][j] < threshold) ? bg : fg;
             }
         }
-        binarized = true;
+        dirty = binarized = true;
         exportImage("binarized.jpg");
     }
 
-    private int Threshold() {
+    private int threshold() {
         
         int[] histogram = imageHistogram();
         int total = img.getHeight() * img.getWidth();

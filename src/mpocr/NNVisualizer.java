@@ -89,7 +89,6 @@ public class NNVisualizer extends JPanel {
             Layer l = nn.getLayer(i);
             
             ldi[i].nc = l.neuronCount();
-            ldi[i].color = l.getMagic();
             ldi[i].fx = ldi[i].x = padding + layer_margin;
             ldi[i].fy = ldi[i].y = padding + (i * ((layer_margin * 2) + layerheight));
             ldi[i].radius = Integer.max(

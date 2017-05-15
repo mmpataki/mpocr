@@ -1,22 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 public class mCanvas extends JPanel {
 
     /* image associated with this mCanvas */
-    OImage oimg;
+    private OImage oimg;
+    
     /* pointer just pointing to the image data of oimg */
-    int[][] iData;
-    int pixelWidth = 1, pixelHeight = 1, offSet = 0;
+    private int[][] iData;
+    
+    /* drawing varibales */
+    private int pixelWidth = 1, pixelHeight = 1, offSet = 0;
 
     public mCanvas() {
         oimg = null;
@@ -26,22 +23,18 @@ public class mCanvas extends JPanel {
         setImage(file);
     }
 
+    public int getPixelWidth() {
+        return pixelWidth;
+    }
+    
+    public int getPixelHeight() {
+        return pixelHeight;
+    }
+    
     public void setPixelSize(int width, int height) {
         pixelHeight = height;
         pixelWidth = width;
         repaint();
-    }
-
-    public int getPixelWidth() {
-        return pixelWidth;
-    }
-
-    public int getPixelHeight() {
-        return pixelHeight;
-    }
-
-    public void printMatrix() {
-        oimg.printimage();
     }
 
     public void setOffset(int offset) {
@@ -51,9 +44,7 @@ public class mCanvas extends JPanel {
     
     public void setPixel(int y, int x, int color) {
         try {
-            ++x;
-            ++y;
-            iData[x][y] = color;
+            iData[++x][++y] = color;
             this.getGraphics().setColor(new Color(iData[y][x]));
             this.getGraphics().fillRect(
                     x * (pixelWidth + offSet),
@@ -114,29 +105,22 @@ public class mCanvas extends JPanel {
         repaint();
     }
 
-    void zoomOut(int i) {
+    public void zoomOut(int i) {
         if (pixelHeight - i > 0 && pixelWidth - i > 0) {
             setPixelSize(pixelWidth - i, pixelHeight - i);
         }
     }
-
-    void zoomIn(int i) {
+    
+    public void zoomIn(int i) {
         setPixelSize(pixelWidth + i, pixelHeight + i);
     }
 
-    void cover() {
-        printMatrix();
+    void binarize() {
+        oimg.xbinarize();
         repaint();
-    }
-    
-    public void mouseReleased(MouseEvent evt) {
-        int x = evt.getX() / (pixelWidth + offSet);
-        int y = evt.getY() / (pixelHeight + offSet);
-        setPixel(y, x, 783456);
     }
 
-    void binarize() {
-        oimg.binarize();
-        repaint();
+    public OImage getImage() {
+        return oimg;
     }
 }

@@ -9,12 +9,11 @@ package mpocr;
  *
  * @author mmp
  */
-public abstract class Callback {
-    
-    /**
-     * This function is called for the callback.
-     * @param param: the paramters to the function
-     */
-    public abstract void function(Object param);
+public class TrainingCallBack extends CallBack {
+
+    @Override
+    public void function(Object param) {
+        
+    }
     
 }

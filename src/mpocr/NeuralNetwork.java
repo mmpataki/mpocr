@@ -5,49 +5,44 @@
  */
 package mpocr;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  *
  * @author mmp
  */
-public class NeuralNetwork implements INeuralNetwork {
+public class NeuralNetwork implements INeuralNetwork, Serializable {
 
-    static NeuralNetwork load(String choseFile) {
-        return null;
-    }
-
-    ArrayList<Layer> layers;
-    double[][] inputWeights;
-    TrainingElement currentElement;
-    ActivationFunction afunc;
-    double learningRate;
-    double cost, totalError;
+    private double learningRate;
+    private double cost, totalError;
     private int epochSize;
-    Callback callBack;
     private double trainingAccuracy;
     private double maxError = 0.0;
     private int currentIteration;
     private int maxIterations = Integer.MAX_VALUE;
+    private ArrayList<Layer> layers;
+    private transient CallBack trainingCallBack;
 
     /**
      * To create a neural network only first and last params are enough Others
      * can be null.
      *
      * @param neuronCounts: numeber of neurons in each layer.
-     * @param weights: weight matrices for each layer. If this is null then the
-     * network will randomize it.
-     * @param biases: biases of each neuron in each layer. If this is null the
-     * network will randomize it.
      * @param afunc: Activation function used for the network.
      * @param learningRate: learningRate of network.
      * @param epochSize : number of iterations before each GD. (for SGD)
      * @throws NeuralNetworkException on invalid weight and bias matrix size.
      */
     public NeuralNetwork(
-            int[] neuronCounts,
-            double[][][] weights,
-            double[][] biases,
+            Vector<Integer> neuronCounts,
             ActivationFunction afunc,
             double learningRate,
             int epochSize
@@ -61,25 +56,18 @@ public class NeuralNetwork implements INeuralNetwork {
             );
         }
 
-        this.afunc = afunc;
         this.learningRate = learningRate;
         this.epochSize = epochSize;
 
-        /* copy the original array and add an extra layer to it. */
-        int[] ncounts = new int[neuronCounts.length + 1];
-        System.arraycopy(neuronCounts, 0, ncounts, 0, neuronCounts.length);
-        ncounts[neuronCounts.length] = neuronCounts[neuronCounts.length - 1];
+        /* Add an extra layer to it. */
+        neuronCounts.add(neuronCounts.get(neuronCounts.size() - 1));
 
         /* add the layers */
-        for (int i = 0; i < ncounts.length - 1; i++) {
+        for (int i = 0; i < neuronCounts.size() - 1; i++) {
             layers.add(
                     new Layer(
-                            ncounts[i],
-                            ncounts[i + 1],
-                            (weights == null || (i + 2) == ncounts.length) ? null : weights[i],
-                            (biases == null) ? null : biases[i],
-                            afunc,
-                            i
+                            neuronCounts.get(i),
+                            neuronCounts.get(i + 1), afunc, i
                     )
             );
         }
@@ -100,10 +88,6 @@ public class NeuralNetwork implements INeuralNetwork {
 
     public int getEpochSize() {
         return epochSize;
-    }
-
-    public void setCallBack(Callback callback) {
-        this.callBack = callback;
     }
 
     public void setEpochSize(int epochSize) {
@@ -128,16 +112,16 @@ public class NeuralNetwork implements INeuralNetwork {
         this.maxError = maxError;
     }
 
-    public TrainingElement getCurrentTrainingElement() {
-        return currentElement;
+    public void setTrainingCallBack(CallBack callBack) {
+        this.trainingCallBack = callBack;
     }
-
+    
     /**
      * Trains the Neural Network with the given TrainingSet.
      *
      * @param set : Trainingset to be used to train.
      */
-    public void train(TrainingSet set) {
+    public synchronized void train(TrainingSet set) {
 
         int currentIndex;
         double[] input, expectedOutput;
@@ -156,7 +140,6 @@ public class NeuralNetwork implements INeuralNetwork {
                 expectedOutput = element.getExpectedOutput();
 
                 currentIndex++;
-                currentElement = element;
 
                 /* propagate forward */
                 fpropagate(input);
@@ -182,9 +165,7 @@ public class NeuralNetwork implements INeuralNetwork {
                     }
                 }
             }
-            if (callBack != null) {
-                callBack.function(this);
-            }
+            trainingCallBack.function(this);
             currentIteration++;
         } while (maxError < totalError && currentIteration < maxIterations);
 
@@ -224,11 +205,11 @@ public class NeuralNetwork implements INeuralNetwork {
 
     @Override
     public String toString() {
-        String toret = "{\n" + "\tlearningrate: " + learningRate + "\n";
-        for (Layer layer : layers) {
-            toret += layer.toString() + "\n";
-        }
-        return toret + "\n}";
+        return 
+                "{" +
+                    "\n\tlearningrate: " + learningRate + "," +
+                    "\n\tlayers : " + layers.toString() +
+                "}";
     }
 
     public int getOutputSize() {
@@ -239,7 +220,15 @@ public class NeuralNetwork implements INeuralNetwork {
         return trainingAccuracy;
     }
 
-    public void save(String storePath) {
-
+    public static NeuralNetwork load(String choseFile) throws FileNotFoundException, IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(choseFile));
+        NeuralNetwork net = (NeuralNetwork) ois.readObject();
+        return net;
     }
+    
+    public void save(String storePath) throws FileNotFoundException, IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storePath));
+        oos.writeObject(this);
+    }
+    
 }

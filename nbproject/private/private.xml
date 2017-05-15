@@ -4,9 +4,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/MainPage.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/OImage.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/TrainingDataLoader.java</file>
-            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Segment.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/DocumentCreator.java</file>
             <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/PixelBuffer.java</file>
+            <file>file:/home/mmp/miniproject/project/mpocr/src/mpocr/Segmentation.java</file>
         </group>
     </open-files>
 </project-private>

@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * @author mmp
  */
-public class Intersects extends FeatureSet {
+public class Intersects implements IFeatureSet {
 
     public static final int magic = 0x10437;
     private double[] features;

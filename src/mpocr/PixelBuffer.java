@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * @author mmp
  */
-public class PixelBuffer extends FeatureSet {
+public class PixelBuffer implements IFeatureSet {
 
     public static final int magic = 0x78342d;
     private static final int WIDTH = 10, HEIGHT = 10;

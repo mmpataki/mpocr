@@ -1,12 +1,5 @@
 package mpocr;
 
-import java.util.Arrays;
-
-/**
- * 
- * @author mmp
- */
-
 class Segment extends BasicImage {
 
     Features features;
@@ -29,18 +22,6 @@ class Segment extends BasicImage {
         features = new Features();
     }
     
-    public void printImage() {
-        for (int i = 0; i < getWidth(); i++)Util.puts("-"); Util.puts("\n");
-        super.printimage();
-        for (int i = 0; i < getWidth(); i++)Util.puts("-"); Util.puts("\n");
-    }
-    
-    public void printImageForce() {
-        for (int i = 0; i < getWidth(); i++)Util.puts("-"); System.out.print("\n");
-        super.printimageforce();
-        for (int i = 0; i < getWidth(); i++)Util.puts("-"); System.out.print("\n");
-    }
-
     public void extractFeatures() {
         features.add(new Zones(this));
         features.add(new PixelBuffer(this));
@@ -118,8 +99,6 @@ class Segment extends BasicImage {
             {{2,4,6}, {4,6,8}},
             {{2,4,8}, {2,6,8}}
         };
-        
-        printImageForce();
         
         do {
             iter = (iter + 1)  % 2;

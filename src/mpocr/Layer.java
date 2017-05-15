@@ -5,15 +5,14 @@
  */
 package mpocr;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  *
  * @author mmp
  */
-public class Layer {
-    
-    public static final int magic = 0x138d75;
+public class Layer implements Serializable {
     
     /*
      * NOTE:
@@ -26,6 +25,7 @@ public class Layer {
     private double[][] weights;
     private double[][] oldWeights;
     private int index;
+    
     /**
      * .
      * ncount: number of neurons in this layer.
@@ -36,47 +36,27 @@ public class Layer {
      * biases : biases for the neurons. If provided null random values will
      *      be assigned to them automatically.
      */
-    Layer(int ncount, int nncount, double[][] weights,
-            double[] biases, ActivationFunction afunc, int index) throws NeuralNetworkException {
+    Layer(int ncount, int nncount, ActivationFunction afunc, int index)
+            throws NeuralNetworkException {
         
-        if(
-            ncount == 0 || nncount == 0 ||
-            (
-                weights != null && 
-                (
-                    weights.length == 0 ||
-                    weights[0].length != nncount  ||
-                    ncount != weights.length
-                ) &&
-                (biases != null && ncount != biases.length)
-            )
-        ) {
+        if(ncount == 0 || nncount == 0) {
             throw new NeuralNetworkException("The number of weights didn't match");
         }
         
         neurons = new Neuron[ncount];
         for (int i = 0; i < ncount; i++) {
-            neurons[i] = new Neuron((biases == null ? null : biases[i]), afunc, i);
+            neurons[i] = new Neuron(afunc, i);
         }
         
-        this.weights = weights;
-        if(this.weights == null) {
-            this.weights = new double[nncount][ncount];
-            randomize((biases == null));
-        }
+        this.weights = new double[nncount][ncount];
+        randomize();
         this.index = index;
     }
     
-    public final void randomize(boolean neuron) {
-        
+    public final void randomize() {
         for (double[] weight : weights) {
             for (int j = 0; j < weights[0].length; j++) {
                 weight[j] = Math.random() * Math.pow(-1, (int)(Math.random()*10000));
-            }
-        }
-        if(neuron) {
-            for (Neuron n : neurons) {
-                n.randomize();
             }
         }
     }
@@ -91,11 +71,6 @@ public class Layer {
         for (int i = 0; i < neurons.length; i++) {
             neurons[i].process(pWeights == null ? null : pWeights[i], pActivations);
         }
-        Util.puts("activations(" + index + ") : [");
-        for (double x : getActivations()) {
-            Util.puts(x + ", ");
-        }
-        Util.puts("]\n");
     }
     
     public void computeErrors(double[] nextErrors) {
@@ -138,10 +113,6 @@ public class Layer {
         return neurons.length;
     }
 
-    public int getMagic() {
-        return magic;
-    }
-
     public double[] getActivations() {
         
         double[] ops = new double[neuronCount()];
@@ -175,14 +146,10 @@ public class Layer {
 
     @Override
     public String toString() {
-        String toret = "\tlayer[" + index + "] : {\n";
-        toret += "\t\tweights : " + Arrays.deepToString(weights) + "\n";
-        toret += "\t\tneurons : " + Arrays.deepToString(neurons) + "\n";
-        return toret + "\t}";
+        return
+                "\n\t\t{" + 
+                    "\n\t\t\tweights : " + Arrays.deepToString(weights) + "," + 
+                    "\n\t\t\tneurons : " + Arrays.deepToString(neurons) + "" + 
+                "\n\t\t}";
     }
-
-    public Neuron[] getNeurons() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

@@ -1,14 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
+import java.io.Serializable;
+
 /**
- *
- * @author mmp
+ *  Just an abstract class for implementing Serializable interface as 
+ *  top level. Use this class to implement other ActivationFunctions.
  */
-public abstract class ActivationFunction implements IActivationFunction{
+public abstract class ActivationFunction implements IActivationFunction, Serializable {
     /* do implement nothing! the subclasses will implement them. */
 }

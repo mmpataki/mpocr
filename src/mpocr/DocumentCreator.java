@@ -1,38 +1,36 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author mmp
+ * This class is seperated out from MainPage's function for creating a
+ * reusable code. This creates a HTML document from the segments recognised.
  */
+
 public class DocumentCreator {
 
-    String document = "";
+    private String document = "";
     private final String SPACE = "&nbsp;";
     private final String LINEBREAK = "<br/>";
     
-    public void create(Segment[] segments) {
+    void create(Segment[] segments) {
         
-        int lineHeight = 1;//AnalyseLineHeight(segments);
-        int spaceWidth = 20;//AnalyseCharWidth(segments);
+        int lineHeight = 30;//AnalyseLineHeight(segments);
+        int spaceWidth = 30;//AnalyseCharWidth(segments);
 
         for (Segment seg : segments) {
             
-            if(seg.getHeight() < 4 || seg.getWidth() < 4) 
+            if(seg.getHeight() < 4 || seg.getWidth() < 4) {
+                for (int i = 0; i < (seg.getNextLines() / lineHeight); i++) {
+                    document += LINEBREAK;
+                }
                 continue;
+            }
             
             for (int i = 0; i < (seg.getPrevSpaces() / spaceWidth); i++) {
                 document += SPACE;
@@ -105,6 +103,5 @@ public class DocumentCreator {
         } catch (IOException ex) {
             Logger.getLogger(DocumentCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
+    }    
 }

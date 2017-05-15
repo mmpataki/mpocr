@@ -10,35 +10,37 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class MainPage extends javax.swing.JFrame {
 
-    private NeuralNetwork net;
     private Plotter plt;
+    private NeuralNetwork net;
+    private String storePath = "neuralnet.net";
     private int featureSetMagic = PixelBuffer.magic;
-    private String storePath;
 
     public MainPage() throws NeuralNetworkException {
 
-        int[] nnnc = {100, 70, 62};
-
+        Vector<Integer> nnnc = new Vector<>();
+        nnnc.add(100);
+        nnnc.add(70);
+        nnnc.add(62);
+        
         initComponents();
         canvas.zoomIn(1);
                 
         plt = new Plotter("error_graph.html", "");
-        net = new NeuralNetwork(nnnc, null, null, new SigmoidFunction(), 0.43, 1);
         
-        net.setMaxError(1.6);
+        net = new NeuralNetwork(nnnc, new SigmoidFunction(), 0.43, 1);
+        net.setMaxError(1.5);
         net.setMaxIterations(800);
-        net.setCallBack(new Callback() {
+        
+        net.setTrainingCallBack(new CallBack() {
             @Override
             public void function(Object param) {
-                System.out.println("Max error : " + net.getNetworkError());
                 plt.addPoint(net.getNetworkError());
+                System.out.println(net.getNetworkError());
             }
         });
         
-        
         /* attach to the visualizer. */
         nnv.setNN(net);
-        
     }
 
     @SuppressWarnings("unchecked")
@@ -260,19 +262,11 @@ public class MainPage extends javax.swing.JFrame {
             String path = "/home/mmp/Desktop/foo/test";
             
             TrainingSet set = TrainingDataLoader.load(
-                    path,
-                    "charcterindex.txt",
-                    "", "", 62,
-                    featureSetMagic
+                    path, 62, featureSetMagic
             );
             System.out.println("Loading done....");
 
-            (new Runnable() {
-                @Override
-                public void run() {
-                    net.train(set);
-                }
-            }).run();
+            net.train(set);
 
             System.out.println("Training Done");
             plt.plot();
@@ -286,10 +280,9 @@ public class MainPage extends javax.swing.JFrame {
         String output = "", soutput = "";
         double[] op;
 
-        canvas.oimg.xbinarize();
-        canvas.redraw();
+        canvas.binarize();
 
-        Segment[] segs = Segmentation.segmentImage(canvas.oimg);
+        Segment[] segs = Segmentation.segmentImage(canvas.getImage());
         for (Segment seg : segs) {
 
             if (seg.getHeight() < 4 || seg.getWidth() < 4) {
@@ -302,7 +295,6 @@ public class MainPage extends javax.swing.JFrame {
                     .getImageData()
             );
             
-            tmp.printImageForce();
             tmp.extractFeatures();
 
             net.fpropagate(tmp.features.get(featureSetMagic).getFeatures());
@@ -344,10 +336,7 @@ public class MainPage extends javax.swing.JFrame {
             String path = "/home/mmp/Desktop/foo/";
             
             TrainingSet set = TrainingDataLoader.load(
-                    path,
-                    "charcterindex.txt",
-                    "", "", 62,
-                    featureSetMagic
+                    path, 62, featureSetMagic
             );
 
             double[] op;
@@ -386,20 +375,26 @@ public class MainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_TestActionPerformed
 
     private void LoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadActionPerformed
-        net = NeuralNetwork.load(storePath);
+        try {
+            net = NeuralNetwork.load(storePath);
+        } catch (IOException | ClassNotFoundException ex) {
+            notifyUser("Invalid file format");
+        }
     }//GEN-LAST:event_LoadActionPerformed
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
-        net.save(storePath);
+        try {
+            net.save(storePath);
+        } catch (IOException ex) {
+            notifyUser("Access Denied!" + ex);
+        }
     }//GEN-LAST:event_SaveActionPerformed
 
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainPage.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            System.out.println("Theme error : " + ex);
         }
 
         /* Create and display the form */
@@ -431,4 +426,8 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private mpocr.NNVisualizer nnv;
     // End of variables declaration//GEN-END:variables
+
+    private void notifyUser(String err) {
+        System.out.println(err);
+    }
 }

@@ -1,22 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.util.Arrays;
 
 /**
- *
- * @author mmp
+ *  This feature contains the count of intersections of foreground pixels
+ *  with the grid lines at DIVS * n where n is in 'N'.
  */
-public class GridIntersects extends FeatureSet {
+public class GridIntersects implements IFeatureSet {
 
+    /* FeatureSet Key */
     public static final int magic = 0x37845;
+    
+    /* Number of grid-lines. */
     private static final int DIVS = 10;
+    
+    /* Dimensions of the segment to which given segment is normalised */
     private static final int WIDTH = 100;
     private static final int HEIGHT = 100;
+    
+    /* feature vector */
     private double[] features;
 
     GridIntersects(Segment s) {

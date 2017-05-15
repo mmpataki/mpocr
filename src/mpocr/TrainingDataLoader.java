@@ -20,23 +20,22 @@ public class TrainingDataLoader {
     
     public static TrainingSet load (
                     String dirpath,
-                    String charactersFile,
-                    String fontsFile,  /* not used */
-                    String stylesFile, /* not used */
                     int outputSize,
                     int featureSetMagic
                 ) throws FileNotFoundException, IOException {
 
-        byte[] chars8;
-        
-        TrainingSet trainingSet = new TrainingSet();
         
         int cnt = 0;
+        File folder;
         String line;
+        byte[] chars8;
+        double[] expectedOutput;
+        TrainingSet trainingSet = new TrainingSet();
+        
         chars8 = new byte[128];
         
         FileReader reader = new FileReader (
-                    Paths.get(dirpath, charactersFile)
+                    Paths.get(dirpath, "charcterindex.txt")
                             .toAbsolutePath()
                             .toString()
                 );
@@ -46,8 +45,6 @@ public class TrainingDataLoader {
             chars8[cnt++] = (byte) line.charAt(0);
         }
         
-        double[] expectedOutput;
-        File folder;
 
         folder = new File(dirpath);
 
