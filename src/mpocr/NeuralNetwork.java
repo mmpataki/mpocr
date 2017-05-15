@@ -129,6 +129,10 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
     public void setTrainingCallBack(CallBack callBack) {
         this.trainingCallBack = callBack;
     }
+
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
+    }
     
     /**
      * Load a neural stored at path 'fileName'
@@ -202,7 +206,8 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
                     }
                 }
             }
-            trainingCallBack.function(this);
+            if(trainingCallBack != null)
+                trainingCallBack.function(this);
             currentIteration++;
         } while (maxError < totalError && currentIteration < maxIterations);
 
@@ -248,4 +253,5 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
                     "\n\tlayers : " + layers.toString() +
                 "}";
     }
+
 }

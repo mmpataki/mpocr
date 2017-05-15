@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 import javax.swing.JPanel;
 
 /**
@@ -18,7 +19,7 @@ public class NNVisualizer extends JPanel {
         int fy, y;
         int radius;
         int yoff;
-        int nc;
+        int nc, dnc;
         int color;
 
         private void reset() {
@@ -29,7 +30,7 @@ public class NNVisualizer extends JPanel {
     
     /* the drawing state objects */
     private int width, height, padding;
-    private int node_margin;
+    private int node_margin, textheight;
     private int layerheight, layerwidth, layer_margin;
     private int fontsize;
     private int nlayers;
@@ -52,11 +53,12 @@ public class NNVisualizer extends JPanel {
         this.fontcolor= new Color(0x000);
         this.layerbackground = new Color(0xf6f6f6);
         this.background = new Color(0xfafafa);
-        this.pipecolor = new Color(0x000000);
+        this.pipecolor = new Color(0x606060);
         this.fontsize = 16;
         this.layer_margin = 3;
         this.node_margin = 5;
         this.padding = 5;
+        this.textheight = 14;
     }
     
     
@@ -85,14 +87,16 @@ public class NNVisualizer extends JPanel {
             Layer l = nn.getLayer(i);
             
             ldi[i].nc = l.neuronCount();
+            ldi[i].dnc = min((ldi[i].nc / 13), ldi[i].nc);
+            ldi[i].color = 0x256a49;
             ldi[i].fx = ldi[i].x = padding + layer_margin;
             ldi[i].fy = ldi[i].y = padding + (i * ((layer_margin * 2) + layerheight));
             ldi[i].radius = Integer.max(
                         Integer.min(
-                            (layerheight - (2 * node_margin)),
-                            (layerwidth - (2 * ldi[i].nc * node_margin)) / ldi[i].nc
+                            (layerheight - (2 * node_margin) - textheight),
+                            (layerwidth - (2 * ldi[i].dnc * node_margin) - textheight) / ldi[i].dnc
                         ) / 2,
-                        3
+                        5
                     );
             ldi[i].yoff = (layerheight - ((node_margin + ldi[i].radius) * 2)) / 2 + fontsize / 2;
             
@@ -100,11 +104,10 @@ public class NNVisualizer extends JPanel {
             g.fillRect(ldi[i].x, ldi[i].y, layerwidth, layerheight);
             g.setFont(new Font("Consolas", Font.BOLD, fontsize - 2));
             g.setColor(fontcolor);
-            g.drawString(("Layer " + (i+1)), ldi[i].x, ldi[i].y + fontsize);
+            g.drawString(("L" + (i+1) + " <" + ldi[i].nc + " neurons>"), ldi[i].x, ldi[i].y + fontsize);
 
-            ldi[i].fx = ldi[i].x = (layerwidth - (2 * ldi[i].nc * (ldi[i].radius + node_margin))) / 2 + node_margin;
-            if(drawlinks && ldi[i].nc > maxconns) 
-                drawlinks = false;
+            ldi[i].fx = ldi[i].x = (layerwidth - (2 * ldi[i].dnc * (ldi[i].radius + node_margin))) / 2 + node_margin;
+            drawlinks = ldi[i].dnc < maxconns;
         }
         
         for (int i = 0; i < nlayers; i++) {
@@ -133,16 +136,16 @@ public class NNVisualizer extends JPanel {
 
         l1.y += node_margin;
         
-        for (int j = 0; j < l1.nc; j++) {
+        for (int j = 0; j < l1.dnc; j++) {
             
             g.setColor(pipecolor);
             
             if(l2 != null && drawlinks) {
                 
                 l2.y += node_margin;
-                int quant = max((l2.nc / maxconns), 1);
+                int quant = max((l2.dnc / maxconns), 1);
                 
-                for (int k = 0; k < l2.nc; k += quant) {
+                for (int k = 0; k < l2.dnc; k += quant) {
                     g.drawLine(
                             l1.x + l1.radius, l1.y + l1.yoff + l1.radius,
                             l2.x + l2.radius, l2.y + l2.yoff + l2.radius
@@ -153,7 +156,20 @@ public class NNVisualizer extends JPanel {
             }
             
             g.setColor(new Color(l1.color));
-            g.fillOval(l1.x, l1.y + l1.yoff, l1.radius * 2, l1.radius * 2);
+            
+            if(l1.nc > l1.dnc && j == (l1.dnc / 2)) {
+                //draw 3 circles of size 5px radius
+                
+                int vmargin = 5;
+                int vrad = 7;//((l1.radius*2) - (3 * vmargin)) / 6;
+                int vhspace = ((vrad * 2) + vmargin) * 3;
+                int vlmargin = ((l1.radius * 2) - vhspace) / 2;
+                for (int b = 0; b < 3; b++) {
+                    g.fillOval(l1.x + (b * (2 * vrad + vmargin)) + vlmargin, l1.y + l1.yoff + l1.radius - vrad, vrad * 2, vrad * 2);
+                }
+            } else {
+                g.fillOval(l1.x, l1.y + l1.yoff, l1.radius * 2, l1.radius * 2);
+            }
             l1.x += (l1.radius + node_margin) * 2;
         }
     }
