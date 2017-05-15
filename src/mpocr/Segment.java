@@ -1,11 +1,25 @@
 package mpocr;
 
+/**
+ * Wrapper around BasicImage with extension store the features and some methods
+ * to manipulate the segments such as bounding, thinning etc.
+ */
+
 class Segment extends BasicImage {
 
-    Features features;
-    int prevSpaces;
-    int nextLines;
-    char detectedChar;
+    /* collection of features */
+    private Features features;
+    
+    /* spaces before the segment */
+    private int prevSpaces;
+    
+    /* lines next to this segment this is set only for last segment in a line*/
+    private int nextLines;
+    
+    /* detected chracter after OCR. */
+    private char detectedChar;
+    
+    /* numbers to add for getting the neighbours of a pixel in clockwise */
     private static final int[][] neighbours= {
                  {-1,0}, {-1,1},
                          {0, 1},
@@ -19,10 +33,22 @@ class Segment extends BasicImage {
     
     public Segment(int[][] iData) {
         super(iData);
-        features = new Features();
+        features = null;
     }
     
-    public void extractFeatures() {
+    /**
+     * Get featureSet with magic number.
+     * @param magic : magic number of feature required.
+     * @return the featureset with the given magic number
+     */
+    public IFeatureSet getFeature(int magic) {
+        if(features == null)
+            extractFeatures();
+        return features.get(magic);
+    }
+    
+    private void extractFeatures() {
+        features = new Features();
         features.add(new Zones(this));
         features.add(new PixelBuffer(this));
         features.add(new Intersects(this));
@@ -45,14 +71,19 @@ class Segment extends BasicImage {
         this.nextLines = nextLines;
     }
     
+    public char getDetection() {
+        return detectedChar;
+    }
+    
     public void setDetection(char ch) {
         detectedChar = ch;
     }
     
-    public char getDetectedChar() {
-        return detectedChar;
-    }
     
+    /**
+     * return a new tighly bounded character of this segment.
+     * @return a new bounded segment.
+     */
     Segment getBounded() {
         
         int wd, ht, fg;
@@ -81,6 +112,8 @@ class Segment extends BasicImage {
         return new Segment(bndbox);
     }
     
+    
+    /** BELOW CODE CURRENTLY NOT USED **
     
     public void thin() {
         
@@ -223,5 +256,5 @@ class Segment extends BasicImage {
         }
         return p;
     }
-
+    /**/
 }

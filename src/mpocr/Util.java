@@ -1,18 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.awt.Component;
 import java.io.File;
-import java.nio.ByteBuffer;
 import javax.swing.JFileChooser;
 
 /**
- *
- * @author mmp
+ * Some useful, really handy functions provided as static.
  */
 class Util {
 
@@ -24,11 +17,13 @@ class Util {
         //System.out.print(toput);
     }
 
-    /* forced output twiddle a character of puts and force output off. */
-    public static void putsf(String toput) {
-        System.out.print(toput);
-    }
-
+    /**
+     * A file chooser dialog creator.
+     * @param chooseDirectory : true is want to choose a directory.
+     * @param parent : The parent frame invoking this dialog eg. MainPage.this
+     * @param title : The title of the dialog.
+     * @return the path to selected file.
+     */
     public static String choseFile(boolean chooseDirectory, Component parent, String title) {
         String path = "";
         JFileChooser ch = new JFileChooser();
@@ -77,15 +72,17 @@ class Util {
         return (((double) fgs / (double) (down - up)) <= excuse);
     }
 
+    /**
+     * minimum of lengths of two arrays.
+     * @param a : array1
+     * @param b : array2
+     * @return minimum length
+     */
     static int minlen(Object[] a, Object[] b) {
         return a.length < b.length ? a.length : b.length;
     }
 
     static int minlen(double[] a, double[] b) {
         return a.length < b.length ? a.length : b.length;
-    }
-
-    static void putsf(double[] features) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

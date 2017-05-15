@@ -1,22 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import static java.lang.Integer.min;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 
 /**
- *
- * @author mmp
+ *  Alternative matrix package for mpocr project. It has a lot of handy
+ *  functions for matrix manipulations.
  */
 public class Matrix {
-    double[][] matrix;
-    int rows;
-    int cols;
+    
+    
+    private double[][] matrix;
+    private int rows;
+    private int cols;
     
     public Matrix(int rows, int cols) {
         this.rows = rows;
@@ -37,6 +33,7 @@ public class Matrix {
         matrix = new double[rows][cols];
         copy(matrix, x.matrix);
     }
+    
     /**
      * Transposes the matrix itself.
      * @throws mpocr.MatrixException
@@ -50,6 +47,7 @@ public class Matrix {
         transpose(dest, matrix);
         matrix = dest;
     }
+    
     /**
      * @param matrix: the matrix to be transposed
      * @return returns the transpose of the supplied matrix
@@ -64,6 +62,13 @@ public class Matrix {
         transpose(dest, matrix);
         return dest;
     }
+    
+    /**
+     * Copies the transpose of matrix into dest 
+     * @param dest : 2D array of order n x m.
+     * @param matrix:2D array of order m x n.
+     * @throws MatrixException 
+     */
     private static void transpose(double[][] dest, double[][] matrix) throws MatrixException {
         
         if(matrix.length == 0 || matrix[0].length == 0 ||
@@ -81,12 +86,23 @@ public class Matrix {
             }
         }
     }
+    
+    /**
+     * Multiplies matrix with self and returns the product matrix.
+     * @param x : another matrix.
+     * @return : product matrix.
+     * @throws MatrixException 
+     */
     public Matrix multiply(Matrix x) throws MatrixException {
         Matrix m = new Matrix(rows, x.cols);
         multiply(m.matrix, matrix, x.matrix);
         return m;
     }
     
+    /**
+     * Multiplies matrix (2D array) a & b and stores result in dest.
+     * @throws MatrixException 
+     */
     public static void multiply(double[][] dest, double[][] a, double[][] b) throws MatrixException {
         if(
                 a == null || b == null || dest == null ||
@@ -111,45 +127,36 @@ public class Matrix {
         }
     }
     
-    public void test() {
-        double[][] a= {{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}};
-        double[][] b= {{1,1,1},{1,1,1},{1,1,1},{1,1,1}};
-        double[][] c= new double[4][3];
-        try {
-            System.out.println("Testing multiplication");
-            Matrix.multiply(c, a, b);
-            System.out.println(matToString(c));
-            System.out.println("Testing transpose");
-            c = Matrix.transpose(c);
-            System.out.println(matToString(c));
-        } catch (Exception ex) {
-            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
     @Override
     public String toString() {
         return matToString(matrix);
     }
     
-    public String matToString(double[][] c) {
-        String s = "";
-        for (double[] ds : c) {
-                s += "\n";
-                for (double d : ds) {
-                    s += (d + " ");
-                }
-            }
-        return s;
+    /**
+     * Returs a string represenation of the 2D array.
+     * @param matrix: 2D array to stringize.
+     * @return String representation of the matrix
+     */
+    public String matToString(double[][] matrix) {
+        return Arrays.deepToString(matrix).replace("],", "]\n");
     }
 
-    public void copy(Matrix x) {
-        if(cols != x.cols || rows != x.rows) {
-            matrix = new double[x.rows][x.cols];
+    /**
+     * Copies the given matrix into self.
+     * @param m : the matrix to be copied.
+     */
+    public void copy(Matrix m) {
+        if(cols != m.cols || rows != m.rows) {
+            matrix = new double[m.rows][m.cols];
         }
-        copy(matrix, x.matrix);
+        copy(matrix, m.matrix);
     }
     
+    /**
+     * Copies a 2D array into other.
+     * @param dest: destination array.
+     * @param src : source array.
+     */
     public static void copy(double[][] dest, double[][] src) {
         for (int i = 0; i < min(dest.length, src.length); i++) {
             System.arraycopy(src[i], 0, dest[i], 0, min(src[0].length, dest[0].length));

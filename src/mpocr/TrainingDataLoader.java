@@ -1,23 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
- *
- * @author mmp
+ * Loads the training images located in the folder pointed by dirpath
+ * The images are needed to be named according to a convention. You can
+ * find it and also generate these images using this tool
+ * Refer : https://github.com/mmpataki/ocrimgen
  */
 public class TrainingDataLoader {
     
+    /**
+     * Loads the images in to a TrainingSet.
+     * @param dirpath : path to the image folder
+     * @param outputSize : output vector size
+     * @param featureSetMagic: magic number of feature to be extracted
+     * @return : TrainingSet.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     public static TrainingSet load (
                     String dirpath,
                     int outputSize,
@@ -25,27 +29,10 @@ public class TrainingDataLoader {
                 ) throws FileNotFoundException, IOException {
 
         
-        int cnt = 0;
         File folder;
-        String line;
-        byte[] chars8;
         double[] expectedOutput;
         TrainingSet trainingSet = new TrainingSet();
         
-        chars8 = new byte[128];
-        
-        FileReader reader = new FileReader (
-                    Paths.get(dirpath, "charcterindex.txt")
-                            .toAbsolutePath()
-                            .toString()
-                );
-        BufferedReader br = new BufferedReader(reader);
-
-        while ((line = br.readLine()) != null) {
-            chars8[cnt++] = (byte) line.charAt(0);
-        }
-        
-
         folder = new File(dirpath);
 
         /* read the directory and populate the training-set */
@@ -65,7 +52,7 @@ public class TrainingDataLoader {
 
             OImage oi = new OImage(Paths.get(dirpath, name).toAbsolutePath().toString());
             if (!oi.isBinarized()) {
-                oi.xbinarize();
+                oi.binarize();
             }
             
             //Segment[] segs = Segmentation.segmentImage(oi);
@@ -76,14 +63,12 @@ public class TrainingDataLoader {
                     continue;
                 }
 
-                seg.extractFeatures();
-
                 expectedOutput = new double[outputSize];
                 expectedOutput[asciiop] = 1;
                 
                 trainingSet.add(
                         new TrainingElement(
-                                seg.features.get(featureSetMagic).getFeatures(),
+                                seg.getFeature(featureSetMagic).getFeatures(),
                                 expectedOutput
                         )
                 );

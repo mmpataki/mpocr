@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.awt.Color;
@@ -12,11 +7,12 @@ import static java.lang.Integer.max;
 import javax.swing.JPanel;
 
 /**
- *
- * @author mmp
+ *  An extended swing component to visualize the NeuralNetwork attached
+ *  to this object.
  */
 public class NNVisualizer extends JPanel {
     
+    /* some drawing info to reduce the redundant calculations */
     private class LayerDrawingInfo {
         int fx, x;
         int fy, y;
@@ -31,16 +27,16 @@ public class NNVisualizer extends JPanel {
         }
     }
     
+    /* the drawing state objects */
     private int width, height, padding;
     private int node_margin;
     private int layerheight, layerwidth, layer_margin;
     private int fontsize;
-    
-    private NeuralNetwork nn;
     private int nlayers;
     private boolean drawlinks = true;
-    
+    private NeuralNetwork nn;
     Color background, pipecolor, layerbackground, fontcolor;
+    
     
     public NNVisualizer() {
         initDefs();
@@ -51,12 +47,12 @@ public class NNVisualizer extends JPanel {
         this.nn = nn;
     }
     
+    /* initialises the defaults */
     private void initDefs() {
         this.fontcolor= new Color(0x000);
         this.layerbackground = new Color(0xf6f6f6);
         this.background = new Color(0xfafafa);
         this.pipecolor = new Color(0x000000);
-        
         this.fontsize = 16;
         this.layer_margin = 3;
         this.node_margin = 5;
@@ -78,7 +74,7 @@ public class NNVisualizer extends JPanel {
             return;
         }
         
-        LayerDrawingInfo ldi[] = new LayerDrawingInfo[nn.layersCount()];
+        LayerDrawingInfo ldi[] = new LayerDrawingInfo[nn.getLayersCount()];
         
         g.setColor(background);
         g.fillRect(0, 0, width, height);
@@ -124,7 +120,7 @@ public class NNVisualizer extends JPanel {
             return;
         }
         
-        nlayers = nn.layersCount();
+        nlayers = nn.getLayersCount();
         if(nlayers == 0) {
             return;
         }

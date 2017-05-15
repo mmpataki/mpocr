@@ -36,7 +36,7 @@ public class DocumentCreator {
                 document += SPACE;
             }
             
-            document += seg.getDetectedChar();
+            document += seg.getDetection();
             
             for (int i = 0; i < (seg.getNextLines() / lineHeight); i++) {
                 document += LINEBREAK;

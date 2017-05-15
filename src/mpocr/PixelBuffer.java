@@ -1,24 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.util.Arrays;
 
 /**
- *
- * @author mmp
+ * Feature with all the pixel intensities in the Image.
  */
 public class PixelBuffer implements IFeatureSet {
 
+    /* FeatureSet Key */
     public static final int magic = 0x78342d;
+    
+    /* Dimensions of the image to which given segment is to be scaled */
     private static final int WIDTH = 10, HEIGHT = 10;
+    
+    /* feature vector */
     private double[] features;
 
     /**
-     *
      * @param s: segment of which feature is to be exported.
      */
     PixelBuffer(Segment s) {
@@ -48,5 +46,4 @@ public class PixelBuffer implements IFeatureSet {
     public double[] getFeatures() {
         return features;
     }
-
 }

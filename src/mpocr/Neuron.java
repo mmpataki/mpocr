@@ -1,26 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.io.Serializable;
 
 /**
- *
- * @author mmp
+ *  Functional core of the Neural Network.
  */
 public class Neuron implements Serializable {
     
+    private int index;
     private double bias;
     private double error;
-    private double activation;
     private double winput;
-    private int index;
+    private double activation;
+    private ActivationFunction afunc;
     
-    ActivationFunction afunc;
-    
+    /**
+     * @param afunc : Activation function to be used.
+     * @param index : index of this neuron in the parent layer.
+     */
     Neuron(ActivationFunction afunc, int index) {
         this.afunc = afunc;
         this.index = index;
@@ -48,14 +45,8 @@ public class Neuron implements Serializable {
     public double getBias() {
         return bias;
     }
-    public final void randomize() {
-        this.bias = Math.pow(-1, (int)(Math.random()*100)) * Math.random();
-    }
     public double getError() {
         return error;
-    }
-    public void setError(double error) {
-        this.error = error;
     }
     public double getDiffActivation() {
         return afunc.derivative(getWeightedInput());
@@ -63,9 +54,18 @@ public class Neuron implements Serializable {
     public double getWeightedInput() {
         return winput + bias;
     }
+    
+    public void setError(double error) {
+        this.error = error;
+    }
     public void setBias(double d) {
         bias = d;
     }
+    
+    public final void randomize() {
+        this.bias = Math.pow(-1, (int)(Math.random()*100)) * Math.random();
+    }
+    
     @Override
     public String toString() {
         return
@@ -76,5 +76,4 @@ public class Neuron implements Serializable {
                     "\n\t\t\t\t\twinput: " + winput +
                 "\n\t\t\t\t}";
     }
-
 }

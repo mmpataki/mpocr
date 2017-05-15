@@ -1,11 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
-
+/**
+ * Implementation of sigmoid function
+ */
 public class SigmoidFunction extends ActivationFunction {
 
     /*
@@ -24,9 +21,6 @@ public class SigmoidFunction extends ActivationFunction {
     public double derivative(double z) {
         double x = fire(z);
         return x * (1 - x);
-        //double x = Math.exp(-z);
-        //double d = 1 + x;
-        //return (x / (d * d));
     }
     
 }

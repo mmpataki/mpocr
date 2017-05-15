@@ -1,22 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.util.Arrays;
 
 /**
- *
- * @author mmp
+ *  Feature containing the count of intersections the foreground makes with
+ *  the 4 semi-diagonals and 2 semi vertical and horizontal dividers.
  */
 public class Intersects implements IFeatureSet {
 
+    /* FeatureSet Key */
     public static final int magic = 0x10437;
+    
+    /* feature vector */
     private double[] features;
     
+    /* dimension of the image to which given segment is to be resized */
     private static final int DIM            = 101;
+    
+    /* indices into the feature vector */
     private static final int TOP_LEFT       = 0;
     private static final int TOP            = 1;
     private static final int TOP_RIGHT      = 2;
@@ -27,6 +28,10 @@ public class Intersects implements IFeatureSet {
     private static final int BOTTOM_RIGHT   = 7;
     
     
+    /**
+     * Constructor
+     * @param s : The segment of which the features are to be extracted.
+     */
     Intersects(Segment s) {
         
         s = new Segment(s.getBounded().resizeImage(DIM, DIM).getImageData());
@@ -39,7 +44,7 @@ public class Intersects implements IFeatureSet {
         features = new double[8];
         
         /* top-left diagonal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = 0; i < HDIM; i++) {
             if(idata[i][i] != cc) {
                 cc = idata[i][i];
@@ -48,7 +53,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* top vertical */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = 0; i < HDIM; i++) {
             if(idata[i][HDIM] != cc) {
                 cc = idata[i][HDIM];
@@ -57,7 +62,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* top-right diagonal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = 0; i < HDIM; i++) {
             if(idata[i][DIM - i - 1] != cc) {
                 cc = idata[i][DIM - i - 1];
@@ -66,7 +71,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* left horizontal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = 0; i < HDIM; i++) {
             if(idata[HDIM][i] != cc) {
                 cc = idata[HDIM][i];
@@ -75,7 +80,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* right horizontal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = HDIM; i < DIM; i++) {
             if(idata[HDIM][i] != cc) {
                 cc = idata[HDIM][i];
@@ -84,7 +89,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* bottom-left diagonal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = HDIM; i < DIM; i++) {
             if(idata[i][DIM - i] != cc) {
                 cc = idata[i][DIM - i];
@@ -93,7 +98,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* bottom vertical */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = HDIM; i < DIM; i++) {
             if(idata[i][HDIM] != cc) {
                 cc = idata[i][HDIM];
@@ -102,7 +107,7 @@ public class Intersects implements IFeatureSet {
         }
         
         /* bottom-right diagonal */
-        cc = ~fg; //just to say not fg.
+        cc = ~fg;
         for (int i = HDIM; i < DIM; i++) {
             if(idata[i][i] != cc) {
                 cc = idata[i][i];
@@ -119,7 +124,7 @@ public class Intersects implements IFeatureSet {
 
     @Override
     public void printFeatures() {
-        Util.putsf("Intersections : " + Arrays.toString(features) + "\n");
+        Util.puts("Intersections : " + Arrays.toString(features) + "\n");
     }
 
     @Override

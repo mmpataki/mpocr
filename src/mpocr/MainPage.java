@@ -295,9 +295,7 @@ public class MainPage extends javax.swing.JFrame {
                     .getImageData()
             );
             
-            tmp.extractFeatures();
-
-            net.fpropagate(tmp.features.get(featureSetMagic).getFeatures());
+            net.fpropagate(tmp.getFeature(featureSetMagic).getFeatures());
             op = net.getOutput();
 
             int mi = 0;
@@ -347,7 +345,7 @@ public class MainPage extends javax.swing.JFrame {
                 net.fpropagate(set.elementAt(i).getInputVector());
                 op = net.getOutput();
                 
-                eop = set.elementAt(i).expectedOutput;
+                eop = set.elementAt(i).getExpectedOutput();
                 int mi = 0;
                 for (int j = 0; j < op.length; j++) {
                     if (op[j] > op[mi]) {
@@ -390,6 +388,10 @@ public class MainPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_SaveActionPerformed
 
+    private void notifyUser(String err) {
+        System.out.println(err);
+    }
+    
     public static void main(String args[]) {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -426,8 +428,4 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private mpocr.NNVisualizer nnv;
     // End of variables declaration//GEN-END:variables
-
-    private void notifyUser(String err) {
-        System.out.println(err);
-    }
 }

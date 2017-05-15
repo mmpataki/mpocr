@@ -1,17 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
+import java.util.Arrays;
+
 /**
- *
- * @author mmp
+ * Features containing the foreground pixel density of the image
+ * in 9 parts of the image.
  */
 public class Zones implements IFeatureSet {
 
+    /* the magic number of the FeatureSet */
     public static final int magic = 0x0001;
+    
+    /* feature vector */
     private double zones[];
     
     /**
@@ -68,11 +68,7 @@ public class Zones implements IFeatureSet {
 
     @Override
     public void printFeatures() {
-        Util.puts("Input vector : [");
-        for (double zone : zones) {
-            Util.puts(zone + ", ");
-        }
-        Util.puts("] \n");
+        Util.puts("Zones : " + Arrays.toString(zones) + "\n");
     }
     
     @Override

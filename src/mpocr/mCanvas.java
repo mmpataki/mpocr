@@ -57,21 +57,6 @@ public class mCanvas extends JPanel {
         }
     }
 
-    public void redraw() {
-        Graphics g = getGraphics();
-        for (int i = 0; i < iData.length; i++) {
-            for (int j = 0; j < iData[0].length; j++) {
-                g.setColor(new Color(iData[i][j] == 0 ? 0 : 0xffffff));
-                g.fillRect(
-                        j * (pixelWidth + offSet),
-                        i * (pixelHeight + offSet),
-                        pixelWidth,
-                        pixelHeight
-                );
-            }
-        }
-    }
-    
     @Override
     public void paintComponent(Graphics g) {
 
@@ -88,7 +73,11 @@ public class mCanvas extends JPanel {
         
         for (int i = 0; i < iData.length; i++) {
             for (int j = 0; j < iData[0].length; j++) {
-                g.setColor(new Color(iData[i][j] == 0 ? 0 : 0xffffff));
+                if(oimg.isBinarized()) {
+                    g.setColor(new Color(iData[i][j] == 0 ? 0 : 0xffffff));
+                } else {
+                    g.setColor(new Color(iData[i][j]));
+                }
                 g.fillRect(
                         j * (pixelWidth + offSet),
                         i * (pixelHeight + offSet),
@@ -99,27 +88,46 @@ public class mCanvas extends JPanel {
         }
     }
 
+    /**
+     * reads an image and sets it to this canvas.
+     * @param path : path to the image.
+     */
     final void setImage(String path) {
         oimg = new OImage(path);
         this.iData = oimg.getImageData();
         repaint();
     }
 
-    public void zoomOut(int i) {
-        if (pixelHeight - i > 0 && pixelWidth - i > 0) {
-            setPixelSize(pixelWidth - i, pixelHeight - i);
+    
+    /**
+     * Zooms out by scale scale
+     * @param scale: the scale to zoomout.
+     */
+    public void zoomOut(int scale) {
+        if (pixelHeight - scale > 0 && pixelWidth - scale > 0) {
+            setPixelSize(pixelWidth - scale, pixelHeight - scale);
         }
     }
     
-    public void zoomIn(int i) {
-        setPixelSize(pixelWidth + i, pixelHeight + i);
+    /**
+     * Zooms in by scale scale
+     * @param scale: the scale to zoomin.
+     */
+    public void zoomIn(int scale) {
+        setPixelSize(pixelWidth + scale, pixelHeight + scale);
     }
 
-    void binarize() {
-        oimg.xbinarize();
+    /**
+     * to binarize the image loaded in this canvas.
+     */
+    public void binarize() {
+        oimg.binarize();
         repaint();
     }
 
+    /**
+     * @return the image in this canvas
+     */
     public OImage getImage() {
         return oimg;
     }

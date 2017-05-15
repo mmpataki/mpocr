@@ -3,11 +3,14 @@ package mpocr;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
+
+/**
+ * Wrapper around BasicImage and some extensions like binarize, grayscale etc.
+ */
 class OImage extends BasicImage {
 
     /* where the image is stored */
@@ -53,9 +56,12 @@ class OImage extends BasicImage {
     }
     
     /* to binarize the image */
-    public void xbinarize() {
+    public void binarize() {
         
         int threshold, ht, wd, bg, fg;
+        
+        if(isBinarized())
+            return;
         
         /* first we need to convert image to grayscale*/
         grayscale();
@@ -163,11 +169,11 @@ class OImage extends BasicImage {
         }
     }
 
-    int getLowByte(int word32, int byteno) {
+    private int getLowByte(int word32, int byteno) {
         return ((word32 >> (byteno << 3)) & 0xff);
     }
     
-    public void grayscale() {
+    private void grayscale() {
         int wd = getWidth();
         int ht = getHeight();
         for (int i = 0; i < ht; i++) {

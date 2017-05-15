@@ -1,21 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- *
- * @author mmp
+ *  The Layer object aggregated in the NeuralNetwork.
  */
 public class Layer implements Serializable {
     
     /*
-     * NOTE:
+     * DESIGN-NOTE:
      *      The weight matrices here hold the weights by this layer
      *  converging into next layer's corresponding indexed neuron in
      *  each row.
@@ -23,48 +17,47 @@ public class Layer implements Serializable {
     
     private Neuron[] neurons;
     private double[][] weights;
-    private double[][] oldWeights;
     private int index;
     
     /**
-     * .
+     *.
      * ncount: number of neurons in this layer.
      * nncount: number of neurons in next layer.
-     * weights : weight matrix of this layer. The format must be transpose
-     *      matrix of the matrix containing the weights emerging out of each
-     *      neuron in a row. if provided null the layer will randomize it
-     * biases : biases for the neurons. If provided null random values will
-     *      be assigned to them automatically.
+     * afunc : ActivationFunction for the layer.
+     * index : index of the layer in the network.
      */
     Layer(int ncount, int nncount, ActivationFunction afunc, int index)
             throws NeuralNetworkException {
         
         if(ncount == 0 || nncount == 0) {
-            throw new NeuralNetworkException("The number of weights didn't match");
+            throw new NeuralNetworkException(
+                    "The neurons in a layer cannot be zero"
+            );
         }
         
+        this.index = index;
         neurons = new Neuron[ncount];
+        this.weights = new double[nncount][ncount];
+        
         for (int i = 0; i < ncount; i++) {
             neurons[i] = new Neuron(afunc, i);
         }
         
-        this.weights = new double[nncount][ncount];
         randomize();
-        this.index = index;
     }
     
     public final void randomize() {
         for (double[] weight : weights) {
             for (int j = 0; j < weights[0].length; j++) {
-                weight[j] = Math.random() * Math.pow(-1, (int)(Math.random()*10000));
+                weight[j] = Math.random() * Math.pow(-1, (int)(Math.random()*10));
             }
         }
     }
     
     /**
      * Process this layers data
-     * @param pWeights : weights between this and previous layer. for input
-     *      layer specify null.
+     * @param pWeights : 
+     *     weights between this and previous layer for input layer specify null.
      * @param pActivations 
      */
     public void process(double[][] pWeights, double[] pActivations) {
@@ -73,6 +66,30 @@ public class Layer implements Serializable {
         }
     }
     
+    /**
+     * Corrects the errors in this layer neurons using GradientDescent.
+     * @param pActivations: previous layer activations.
+     * @param pWeights: previous layer weights
+     * @param eta : learning rate.
+     */
+    public void correctErrors(double[] pActivations, double[][] pWeights, double eta) {
+        for (int i = 0; i < neuronCount(); i++) {
+            neurons[i].setBias(neurons[i].getBias() - (eta * neurons[i].getError()));
+        }
+        if(pWeights == null)
+            return;
+        
+        for (int i = 0; i < pWeights.length; i++) {
+            for (int j = 0; j < pActivations.length; j++) {
+                pWeights[i][j] -= (eta * (pActivations[j] * neurons[i].getError()));
+            }
+        }
+    }
+    
+    /**
+     * computes errors of this layer neurons and sets them to neurons.
+     * @param nextErrors : nextLayer errors.
+     */
     public void computeErrors(double[] nextErrors) {
 
         double[][] transposeWeights, tmpErrors, errors;
@@ -130,20 +147,6 @@ public class Layer implements Serializable {
         return errors;
     }
     
-    public void correctErrors(double[] activations, double[][] pWeights, double eta, int index) {
-        for (int i = 0; i < neuronCount(); i++) {
-            neurons[i].setBias(neurons[i].getBias() - (eta * neurons[i].getError()));
-        }
-        if(pWeights == null)
-            return;
-        
-        for (int i = 0; i < pWeights.length; i++) {
-            for (int j = 0; j < activations.length; j++) {
-                pWeights[i][j] -= (eta * (activations[j] * neurons[i].getError()));
-            }
-        }
-    }
-
     @Override
     public String toString() {
         return

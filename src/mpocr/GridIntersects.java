@@ -71,5 +71,4 @@ public class GridIntersects implements IFeatureSet {
     public double[] getFeatures() {
         return features;
     }
-
 }

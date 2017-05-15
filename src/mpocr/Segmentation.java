@@ -2,14 +2,14 @@ package mpocr;
 
 import java.util.ArrayList;
 
+/**
+ * A static implementation of segmentation.
+ */
 class Segmentation {
     
-    public static final int VERSION = 1;
-    
-    
     /**
-     * 
-     * @param oi: image data needed to be segmented.
+     * Segments the given binarized image.
+     * @param oi: binarized image to be segmented.
      * @return the segments formed from the given image data
      * 
      *      The idea is to find the linegaps and divide them into lines and

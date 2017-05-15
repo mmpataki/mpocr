@@ -6,6 +6,10 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * represents the layer in the region chart.
+ * @author mmp
+ */
 class PlotLayer {
     String fill, stroke, cfill = "white";
     int cradius = 3;
@@ -37,14 +41,19 @@ class PlotLayer {
     }
 }
 
+/**
+ * A helper utility to create charts for some data uses the mchartjs library
+ * refer : https://github.com/mmpataki/mchartjs
+ */
 public class Plotter {
-    
+
+    /* types of charts supported */
     public static final int REGION = 0;
     public static final int BAR = 1;
     public static final int DOT = 2;
-    private String[] types = {
-        "region", "bar", "dot"
-    };
+    
+    /* string type names of the chart types */
+    private String[] types = { "region", "bar", "dot" };
     
     String ofile, cpath, back="transparent", lcolor = "skyblue", stroke = "gray", lstroke = "black";
     int type = REGION;
@@ -70,22 +79,45 @@ public class Plotter {
         chooseLayer(choosen + 1);
     }
     
+    /**
+     * flushes a chart to the output file in HTML format.
+     */
     public void flush() {
         for (PlotLayer plotLayer : dlist) {
             plotLayer.flush();
         }
     }
 
+    /**
+     * set the color of the current layer.
+     * @param color : HTML style color representation string.
+     */
     public void setColor(String color) {
         dlist.get(choosen).fill = color;
     }
     
-    public void chooseLayer(int layer) {
-        if(layer < 0 || layer >= dlist.size())
-            return;
-        choosen = layer;
+    /**
+     * Set type of the chart.
+     * @param type : one of the constants BAR | DOT | REGION.
+     */
+    void setType(int type) {
+        this.type = type % 3;
     }
     
+    /**
+     * Choose a layer in the chart with index 'index'
+     * @param index : index of the layer to be choosed
+     */
+    public void chooseLayer(int index) {
+        if(index < 0 || index >= dlist.size())
+            return;
+        choosen = index;
+    }
+    
+    /**
+     * Adds a point to the current layer.
+     * @param d : point to be added.
+     */
     public void addPoint(double d) {
         dlist.get(choosen).add(d);
         if(dlist.get(choosen).size() > maxx)
@@ -94,21 +126,7 @@ public class Plotter {
         maxy = (d < maxy) ? maxy : d;
     }
     
-    private double aMax(Double[] a) {
-        Double m = a[0];
-        for (int i = 1; i < a.length; i++) {
-            if(m < a[i])
-                m = a[i];
-        }
-        return m;
-    }
-    
     public void plot() {
-        plot(10, type);
-    }
-    
-    
-    public void plot(int factor, int type) {
         
         //calculate xdivs and ydivs
         xdivs = Integer.min(60, maxx);
@@ -122,6 +140,7 @@ public class Plotter {
             Logger.getLogger(Plotter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
     
     @Override
     public String toString() {
@@ -137,8 +156,13 @@ public class Plotter {
                     "\"datasets\": " + dlist + "" +
                 "}";
     }
-
-    void setType(int type) {
-        this.type = type % 3;
+    
+    private double aMax(Double[] a) {
+        Double m = a[0];
+        for (int i = 1; i < a.length; i++) {
+            if(m < a[i])
+                m = a[i];
+        }
+        return m;
     }
 }

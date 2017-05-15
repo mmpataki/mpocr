@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 import java.io.FileInputStream;
@@ -16,21 +11,36 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 /**
- *
+ * An implementation of FeedForward NeuralNetork with Backpropogation 
  * @author mmp
  */
 public class NeuralNetwork implements INeuralNetwork, Serializable {
 
-    private double learningRate;
-    private double cost, totalError;
+    /* size of the epoch to feed before a GD. */
     private int epochSize;
-    private double trainingAccuracy;
-    private double maxError = 0.0;
+    
+    /* learning rate of the network. [0, 1] */
+    private double learningRate;
+    
+    /* current Iteration of training */
     private int currentIteration;
-    private int maxIterations = Integer.MAX_VALUE;
+    
+    /* maximum error allowed below which training stops */
+    private double maxError = 0.0;
+    
+    /* cost and error of the network */
+    private double cost, totalError;
+    
+    /* layers in this network. */
     private ArrayList<Layer> layers;
+    
+    /* maximum iterations allowed for a training. */
+    private int maxIterations = Integer.MAX_VALUE;
+    
+    /* a callback object which is called per iteration of training. */
     private transient CallBack trainingCallBack;
 
+    
     /**
      * To create a neural network only first and last params are enough Others
      * can be null.
@@ -41,7 +51,7 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
      * @param epochSize : number of iterations before each GD. (for SGD)
      * @throws NeuralNetworkException on invalid weight and bias matrix size.
      */
-    public NeuralNetwork(
+    NeuralNetwork(
             Vector<Integer> neuronCounts,
             ActivationFunction afunc,
             double learningRate,
@@ -74,7 +84,7 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
     }
 
     @Override
-    public int layersCount() {
+    public int getLayersCount() {
         return layers.size();
     }
 
@@ -85,7 +95,11 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
         }
         return layers.get(index);
     }
-
+    
+    public double[] getOutput() {
+        return layers.get(layers.size() - 1).getActivations();
+    }
+    
     public int getEpochSize() {
         return epochSize;
     }
@@ -117,17 +131,41 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
     }
     
     /**
+     * Load a neural stored at path 'fileName'
+     * @param fileName : path of file where a NeuralNetwork is stored by save()
+     * @return a loaded NeuralNetwork
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public static NeuralNetwork load(String fileName) throws FileNotFoundException, IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
+        NeuralNetwork net = (NeuralNetwork) ois.readObject();
+        return net;
+    }
+    
+    /**
+     * Store this NeuralNetwork at path 'storePath'.
+     * @param storePath: path to a file where to store this network
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public void save(String storePath) throws FileNotFoundException, IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storePath));
+        oos.writeObject(this);
+    }
+    
+    /**
      * Trains the Neural Network with the given TrainingSet.
      *
      * @param set : Trainingset to be used to train.
      */
-    public synchronized void train(TrainingSet set) {
+    public void train(TrainingSet set) {
 
         int currentIndex;
         double[] input, expectedOutput;
 
         currentIndex = 0;
-        trainingAccuracy = 0;
         currentIteration = 0;
 
         do {
@@ -147,7 +185,7 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
                 computeLastLayerError(expectedOutput);
 
                 /* Now propagate the error backwards to find the gradient. */
-                for (int i = layersCount() - 2; i > 0; i--) {
+                for (int i = getLayersCount() - 2; i > 0; i--) {
                     layers.get(i).computeErrors(layers.get(i + 1).getErrors());
                 }
 
@@ -155,12 +193,11 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
                 if ((currentIndex % epochSize) == 0) {
 
                     /* now correct errors */
-                    for (int i = layersCount() - 1; i > 0; i--) {
+                    for (int i = getLayersCount() - 1; i > 0; i--) {
                         layers.get(i).correctErrors(
                                 (i == 0) ? input : layers.get(i - 1).getActivations(),
                                 (i == 0) ? null : layers.get(i - 1).getWeights(),
-                                learningRate,
-                                i
+                                learningRate
                         );
                     }
                 }
@@ -171,17 +208,27 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
 
     }
 
-    public double[] getOutput() {
-        return layers.get(layers.size() - 1).getActivations();
+    /**
+     * Propogates the input through the netork.
+     * @param input : input to the network.
+     */
+    public void fpropagate(double[] input) {
+        double[][] wts = null;
+        double[] ip = input;
+        for (int i = 0; i < getLayersCount(); i++) {
+            layers.get(i).process(wts, ip);
+            wts = layers.get(i).getWeights();
+            ip = layers.get(i).getActivations();
+        }
     }
-
+    
     private void computeLastLayerError(double[] output) {
         double err, errSum, diff;
         Layer lastLayer;
         Neuron neuron;
 
         errSum = 0;
-        lastLayer = layers.get(layersCount() - 1);
+        lastLayer = layers.get(getLayersCount() - 1);
 
         for (int i = 0; i < lastLayer.neuronCount(); i++) {
             neuron = lastLayer.getNeuron(i);
@@ -193,16 +240,6 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
         totalError += errSum / 2;
     }
 
-    public void fpropagate(double[] input) {
-        double[][] wts = null;
-        double[] ip = input;
-        for (int i = 0; i < layersCount(); i++) {
-            layers.get(i).process(wts, ip);
-            wts = layers.get(i).getWeights();
-            ip = layers.get(i).getActivations();
-        }
-    }
-
     @Override
     public String toString() {
         return 
@@ -211,24 +248,4 @@ public class NeuralNetwork implements INeuralNetwork, Serializable {
                     "\n\tlayers : " + layers.toString() +
                 "}";
     }
-
-    public int getOutputSize() {
-        return layers.get(layersCount() - 1).neuronCount();
-    }
-
-    public double getTrainingAccuracy() {
-        return trainingAccuracy;
-    }
-
-    public static NeuralNetwork load(String choseFile) throws FileNotFoundException, IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(choseFile));
-        NeuralNetwork net = (NeuralNetwork) ois.readObject();
-        return net;
-    }
-    
-    public void save(String storePath) throws FileNotFoundException, IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storePath));
-        oos.writeObject(this);
-    }
-    
 }

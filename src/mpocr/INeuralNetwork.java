@@ -1,15 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mpocr;
 
 /**
- *
- * @author mmp
+ *  A must interface for NeuralNetworks which is used by NNVisualizer.
  */
 public interface INeuralNetwork {
-    public int layersCount();
+    
+    /* to get the number of layers */
+    public int getLayersCount();
+    
+    /* to get a layer in network. */
     public Layer getLayer(int index);
 }

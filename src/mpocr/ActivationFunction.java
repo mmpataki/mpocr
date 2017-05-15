@@ -3,9 +3,15 @@ package mpocr;
 import java.io.Serializable;
 
 /**
- *  Just an abstract class for implementing Serializable interface as 
- *  top level. Use this class to implement other ActivationFunctions.
+ *  Genaralization of Activation Function. Use this class to implement other
+ *  ActivationFunctions like SigmoidFunction, Tanh ...
  */
-public abstract class ActivationFunction implements IActivationFunction, Serializable {
-    /* do implement nothing! the subclasses will implement them. */
+public abstract class ActivationFunction implements Serializable {
+    
+    /* function to compute the activation */
+    public abstract double fire(double z);
+    
+    /* function to compute the derivate of the activation */
+    public abstract double derivative(double a);
+    
 }
