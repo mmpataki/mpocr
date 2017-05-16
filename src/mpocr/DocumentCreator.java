@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class DocumentCreator {
 
-    private String document = "";
+    private String document = "<pre style='font-family: Courier'>";
     private final String SPACE = "&nbsp;";
     private final String LINEBREAK = "<br/>";
     
@@ -42,6 +42,7 @@ public class DocumentCreator {
                 document += LINEBREAK;
             }
         }
+        document += "</pre>";
     }
 
     private int AnalyseLineHeight(Segment[] segments) {

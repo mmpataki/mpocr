@@ -38,6 +38,11 @@ class OImage extends BasicImage {
         }
     }
 
+    OImage(int[][] xdata) {
+        dirty = true;
+        iData = xdata;
+    }
+
     /* to read the image from the file at 'path' */
     public final void readImage(String path) {
         try {
@@ -65,7 +70,7 @@ class OImage extends BasicImage {
         
         /* first we need to convert image to grayscale*/
         grayscale();
-        exportImage("grayscale.jpg");
+        exportImage("grayscale");
         
         wd = getWidth();
         ht = getHeight();
@@ -79,7 +84,7 @@ class OImage extends BasicImage {
             }
         }
         dirty = binarized = true;
-        exportImage("binarized.jpg");
+        exportImage("binarized");
     }
 
     private int threshold() {
@@ -140,7 +145,7 @@ class OImage extends BasicImage {
     /* export image to a file */
     public void exportImage(String path) {
         try {
-            File ProcessedImage = new File(path);
+            File ProcessedImage = new File(path + ".png");
 
             if(dirty) {
                 int wd = getWidth() - 1;
@@ -152,7 +157,7 @@ class OImage extends BasicImage {
                     }
                 }
             }
-            ImageIO.write(img, "jpg", ProcessedImage);
+            ImageIO.write(img, "png", ProcessedImage);
         } catch (IOException ex) {
             Logger.getLogger(OImage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -173,6 +178,9 @@ class OImage extends BasicImage {
         return ((word32 >> (byteno << 3)) & 0xff);
     }
     
+    /**
+     * Converts an image into grayscale.
+     */
     private void grayscale() {
         int wd = getWidth();
         int ht = getHeight();

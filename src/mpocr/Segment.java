@@ -78,7 +78,28 @@ class Segment extends BasicImage {
     public void setDetection(char ch) {
         detectedChar = ch;
     }
-    
+
+    /**
+     * Export the current image as an png image.
+     * @param: path
+     */
+    public void exportBinary(String path) {
+        int ht, wd;
+        int[][] xdata;
+        
+        ht = getHeight();
+        wd = getWidth();
+        xdata = new int[ht][wd];
+        
+        for (int i = 0; i < ht; i++) {
+            for (int j = 0; j < wd; j++) {
+                xdata[i][j] = -iData[i][j];
+            }
+        }
+        
+        OImage img = new OImage(xdata);
+        img.exportImage(path);
+    }    
     
     /**
      * return a new tighly bounded character of this segment.
