@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 import java.io.Serializable;
 import java.util.Arrays;

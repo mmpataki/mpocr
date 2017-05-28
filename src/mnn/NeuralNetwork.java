@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

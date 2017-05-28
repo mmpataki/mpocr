@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 /**
  * Wrapper around the Exception with a good name.

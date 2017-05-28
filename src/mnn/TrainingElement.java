@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 /**
  * Wrapper around the input and expectedOutput of a training component.

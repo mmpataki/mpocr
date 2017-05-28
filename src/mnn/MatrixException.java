@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 /**
  * Just a wrapper around the Exception class with some debuggging information.

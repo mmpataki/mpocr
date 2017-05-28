@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 import java.awt.Color;
 import java.awt.Font;

@@ -1,4 +1,4 @@
-package mpocr;
+package mnn;
 
 /**
  * Implementation of sigmoid function
